@@ -7,7 +7,10 @@ import pandas as pd
 def import_csv_entity[T: BaseModel](
     CACHE: dict[str, T],
     entity: T,
-    arquivo_name: dict = {"Modalidades": "manager/teaching-modality.unig_producao.csv"},
+    arquivo_name: dict = {
+        "Modalidades": "manager/teaching-modality.unig_producao.csv",
+        "NivelEnsino": "manager/education-level.unig_producao.csv",
+    },
 ):
     path_output = Path.cwd() / "manager"
     path_output.mkdir(exist_ok=True, parents=True)
