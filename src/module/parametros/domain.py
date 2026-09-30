@@ -21,17 +21,12 @@ class Parametros(BaseModel):
 
         result = result[colls["valor"]]
 
-        entidade = []
-        entidade.append(
-            cls(
-                sigla_unidade=result[0],
-                nome_unidade=result[1],
-                isGPA=result[2],
-                isNPJ=result[3],
-            )
+        return cls(
+            sigla_unidade=result[0],
+            nome_unidade=result[1],
+            isGPA=result[2],
+            isNPJ=result[3],
         )
-
-        return entidade
 
     # =========================================
     # VALIDATORS

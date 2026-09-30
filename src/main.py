@@ -13,7 +13,7 @@ def main():
 
     CACHE = {}
 
-    CACHE["Parametros"] = Parametros.read_excel(file_path)[0]
+    CACHE["Parametros"] = Parametros.read_excel(file_path)
     CACHE["Modalidades"] = Modalidades.read_excel(file_path)
     CACHE["NivelEnsino"] = NivelEnsino.read_excel(file_path)
 
