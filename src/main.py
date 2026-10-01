@@ -3,8 +3,7 @@ from pathlib import Path
 from src.module.parametros.domain import Parametros
 from src.module.modalidades.domain import Modalidades
 from src.module.niveis_ensino.domain import NivelEnsino
-
-from src.module.util.import_csv_entity import import_csv_entity
+from src.module.categorias_disc.domain import CategoriasDisc
 
 
 def main():
@@ -16,9 +15,7 @@ def main():
     CACHE["Parametros"] = Parametros.read_excel(file_path)
     CACHE["Modalidades"] = Modalidades.read_excel(file_path)
     CACHE["NivelEnsino"] = NivelEnsino.read_excel(file_path)
-
-    import_csv_entity(CACHE, Modalidades)
-    import_csv_entity(CACHE, NivelEnsino)
+    CACHE["CategoriasDisc"] = CategoriasDisc.read_excel(file_path)
 
 
 if "__main__" == __name__:
