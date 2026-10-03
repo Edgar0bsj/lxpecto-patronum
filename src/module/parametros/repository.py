@@ -8,15 +8,15 @@ from src.module.parametros.dto import ParametrosDto
 class Repository:
 
     @staticmethod
-    def save(entity: ParametrosDto) -> Parametros:
+    def save(entityDto: ParametrosDto) -> Parametros:
 
         with SessionLocal() as session:
 
             parametros = Parametros(
-                sigla_unidade=entity.sigla_unidade,
-                nome_unidade=entity.nome_unidade,
-                isGPA=entity.isGPA,
-                isNPJ=entity.isNPJ,
+                sigla_unidade=entityDto.sigla_unidade,
+                nome_unidade=entityDto.nome_unidade,
+                isGPA=entityDto.isGPA,
+                isNPJ=entityDto.isNPJ,
             )
 
             session.add(parametros)
@@ -36,3 +36,38 @@ class Repository:
             parans = session.scalars(statement).all()
 
             return parans
+
+    @staticmethod
+    def edit(id: int, entityDto: ParametrosDto) -> Parametros | None:
+
+        with SessionLocal() as session:
+
+            param = session.get(Parametros, id)
+
+            if not param:
+                return None
+
+            param.sigla_unidade = entityDto.sigla_unidade
+            param.nome_unidade = entityDto.nome_unidade
+            param.isGPA = entityDto.isGPA
+            param.isNPJ = entityDto.isNPJ
+
+            session.commit()
+            session.refresh(param)
+
+            return param
+
+    @staticmethod
+    def delete(id: int) -> bool:
+
+        with SessionLocal() as session:
+
+            entity = session.get(Parametros, id)
+
+            if not entity:
+                return False
+
+            session.delete(entity)
+            session.commit()
+
+            return True
