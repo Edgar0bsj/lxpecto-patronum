@@ -42,7 +42,7 @@ class ParametroController:
     # =========================================
     # Utils
     # =========================================
-    def get_param(self) -> dict:
+    def get_info(self) -> dict:
         existParans = self.service.find_all()
 
         if len(existParans) == 0:
@@ -64,6 +64,7 @@ class ParametroController:
 
             if len(existParans) > 0:
                 print("Já existe parametro cadastrado")
+                input()
                 return
 
             req = get_parametros_form()
@@ -87,6 +88,7 @@ class ParametroController:
 
         if len(existParans) == 0:
             print("Não existe parametro cadastrado")
+            input()
             return
 
         data = [
@@ -112,6 +114,8 @@ class ParametroController:
 
         if result is None:
             print("Error ao editar Parametro")
+            input()
+
             return
 
         print("Parametro editado com sucesso!")
@@ -121,6 +125,7 @@ class ParametroController:
 
         if len(existParans) == 0:
             print("Não existe parametro cadastrado")
+            input()
             return
 
         result = delete_parametros_confim()

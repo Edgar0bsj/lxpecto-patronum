@@ -5,7 +5,8 @@ from rich import print
 from rich.panel import Panel
 
 from src.module.parametros.controller import ParametroController
-from src.cli.prompts import *
+from src.module.modalidade.controller import ModalidadeController
+from src.cli.prompts import main_menu_prompt
 from src.module.util.clear_terminal import clear_terminal
 
 
@@ -13,14 +14,18 @@ def main():
     file_path = Path("Planilha_Mestre.xlsx")
 
     parametroController = ParametroController()
+    modalidadeController = ModalidadeController()
 
     while True:
-        paramInfo = parametroController.get_param()
+        paramInfo = parametroController.get_info()
+        modInfo = modalidadeController.get_info()
         info = (
-            f"[bold white]Nome da Unidade:[/bold white] {paramInfo['nome']}\n"
-            f"[bold white]Sigla da Unidade:[/bold white] {paramInfo['sigla']}\n"
-            f"[bold white]GPA:[/bold white]              {paramInfo['gpa']}\n"
-            f"[bold white]NPJ:[/bold white]              {paramInfo['npj']}"
+            f"[bold white]Nome da Unidade:[/bold white] [bold green]{paramInfo['nome']}[/bold green]\n"
+            f"[bold white]Sigla da Unidade:[/bold white] [bold green]{paramInfo['sigla']}[/bold green]\n"
+            f"[bold white]GPA:[/bold white]              [bold green]{paramInfo['gpa']}[/bold green]\n"
+            f"[bold white]NPJ:[/bold white]              [bold green]{paramInfo['npj']}[/bold green]\n\n"
+            f"[bold cyan]--- ULTIMA IMPORTAÇÕES ---[/bold cyan]\n"
+            f"[bold white]Modalidade:[/bold white]       [bold green]{modInfo["date"]}[/bold green]\n"
         )
         print(
             Panel(info, title="[bold cyan]LXPectro Patronum[/bold cyan]", expand=False)
@@ -36,6 +41,9 @@ def main():
 
             case "Parametros":
                 parametroController.run()
+
+            case "Modalidade":
+                modalidadeController.run()
 
             case _:
                 print("Error")
