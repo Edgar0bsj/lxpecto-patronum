@@ -24,7 +24,7 @@ class Service:
 
         box = []
         box_erros = []
-        for i, v in df.iterrows():
+        for _, v in df.iterrows():
             try:
                 box.append(
                     ModalidadeDto(
@@ -34,7 +34,7 @@ class Service:
                     )
                 )
             except ValidationError as err:
-                box_erros.append({"linha": i + 1, "msg": err})
+                box_erros.append(err)
 
         return (box, box_erros)
 

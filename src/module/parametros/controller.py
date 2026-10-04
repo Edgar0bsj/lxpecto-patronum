@@ -8,6 +8,7 @@ from src.module.parametros.service import Service
 from src.module.parametros.model import Parametros
 from src.cli.prompts import get_parametros_form
 from src.module.parametros.dto import ParametrosDto
+from src.module.parametros.decorator.handle_exceptions import handle_exceptions
 
 
 class ParametroController:
@@ -58,31 +59,30 @@ class ParametroController:
     # =========================================
     # HANDLES
     # =========================================
+    @handle_exceptions
     def _handle_create_parametro(self):
-        try:
-            existParans = self.service.find_all()
 
-            if len(existParans) > 0:
-                print("Já existe parametro cadastrado")
-                input()
-                return
+        existParans = self.service.find_all()
 
-            req = get_parametros_form()
+        if len(existParans) > 0:
+            print("Já existe parametro cadastrado")
+            input()
+            return
 
-            dto = ParametrosDto(
-                sigla_unidade=req["sigla"],
-                nome_unidade=req["nome"],
-                isGPA=req["gpa"],
-                isNPJ=req["npj"],
-            )
+        req = get_parametros_form()
 
-            self.service.create(dto)
+        dto = ParametrosDto(
+            sigla_unidade=req["sigla"],
+            nome_unidade=req["nome"],
+            isGPA=req["gpa"],
+            isNPJ=req["npj"],
+        )
 
-            print("Parametro criado com Sucesso!")
+        self.service.create(dto)
 
-        except Exception as err:
-            print(err)
+        print("Parametro criado com Sucesso!")
 
+    @handle_exceptions
     def _handle_edit_parametro(self):
         existParans = self.service.find_all()
 
@@ -120,6 +120,7 @@ class ParametroController:
 
         print("Parametro editado com sucesso!")
 
+    @handle_exceptions
     def _handle_delete_parametro(self):
         existParans = self.service.find_all()
 
