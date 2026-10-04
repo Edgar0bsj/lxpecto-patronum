@@ -1,5 +1,6 @@
 import pandas as pd
 from pydantic import ValidationError
+from src.module.modalidade.errs.handle_errs import ModalidadeValidationError
 
 from datetime import datetime
 from src.module.modalidade.model import Modalidade
@@ -22,8 +23,8 @@ class Service:
         },
     ) -> tuple[list[ModalidadeDto], list]:
 
-        box = []
-        box_erros = []
+        box: list[ModalidadeDto] = []
+        box_erros: list[ValidationError] = []
         for _, v in df.iterrows():
             try:
                 box.append(
@@ -35,6 +36,19 @@ class Service:
                 )
             except ValidationError as err:
                 box_erros.append(err)
+
+        codigos = set()
+        codigos_duplicado = set()
+        for e in box:
+            if e.codigo in codigos:
+                codigos_duplicado.add(e.codigo)
+            else:
+                codigos.add(e.codigo)
+
+        if len(codigos_duplicado) > 0:
+            raise ModalidadeValidationError(
+                message="Código duplicado", field=codigos_duplicado
+            )
 
         return (box, box_erros)
 
