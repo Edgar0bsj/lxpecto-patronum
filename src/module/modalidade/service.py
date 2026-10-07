@@ -2,8 +2,6 @@ import pandas as pd
 from pydantic import ValidationError
 from src.module.modalidade.errs.handle_errs import ModalidadeValidationError
 
-from datetime import datetime
-from src.module.modalidade.model import Modalidade
 from src.module.modalidade.dto import ModalidadeDto
 from src.module.modalidade.repository import Repository
 from pandas import DataFrame

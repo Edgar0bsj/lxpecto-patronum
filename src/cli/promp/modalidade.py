@@ -6,10 +6,11 @@ def modalidade_menu_prompt() -> str:
         "=== MODALIDADE ===",
         instruction=" ",
         choices=[
-            "Importar via Excel",
-            "Deletar via Excel",
-            "Exportar em Excel",
-            "Voltar",
+            "Baixar Modelo em Branco (.xlsx)",
+            "Importar Dados do Excel",
+            "Exportar Dados Cadastrados",
+            "Excluir Dados via Excel",
+            "Voltar ao Menu Principal",
         ],
     ).ask()
 

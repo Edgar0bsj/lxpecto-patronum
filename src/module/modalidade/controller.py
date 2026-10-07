@@ -22,22 +22,27 @@ class ModalidadeController:
         while True:
             choice = modalidade_menu_prompt()
 
-            if choice == "Voltar" or choice is None:
+            if choice == "Voltar ao Menu Principal" or choice is None:
                 break
 
             match choice:
 
-                case "Importar via Excel":
+                case "Baixar Modelo em Branco (.xlsx)":
+                    print("EM DESENVOLVIMENTO")
+                    input()
+                    break
+
+                case "Importar Dados do Excel":
                     self._handle_import_mod_excel()
                     break
 
-                case "Deletar via Excel":
+                case "Exportar Dados Cadastrados":
                     print("EM DESENVOLVIMENTO")
                     input()
 
                     break
 
-                case "Exportar em Excel":
+                case "Excluir Dados via Excel":
                     print("EM DESENVOLVIMENTO")
                     input()
 
@@ -55,9 +60,9 @@ class ModalidadeController:
         last_update = self.service.find_last_update()
 
         if not last_update:
-            return {"date": "-", "time": "-"}
+            return {"last_update": "-"}
 
-        return {"date": str(last_update.date()), "time": str(last_update.time())}
+        return {"last_update": str(last_update.date())}
 
     # =========================================
     # HANDLES

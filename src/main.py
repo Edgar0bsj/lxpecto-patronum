@@ -32,7 +32,7 @@ def main():
             f"[bold white]GPA:[/bold white]              [bold green]{paramInfo['gpa']}[/bold green]\n"
             f"[bold white]NPJ:[/bold white]              [bold green]{paramInfo['npj']}[/bold green]\n\n"
             f"[bold cyan]--- ULTIMA IMPORTAÇÕES ---[/bold cyan]\n"
-            f"[bold white]Modalidade:[/bold white]       [bold green]{modInfo["date"]}[/bold green]\n"
+            f"[bold white]Modalidade:[/bold white]       [bold green]{modInfo["last_update"]}[/bold green]\n"
         )
         print(
             Panel(info, title="[bold cyan]LXPectro Patronum[/bold cyan]", expand=False)
