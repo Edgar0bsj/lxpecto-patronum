@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from src.module.util.dynamic_table import DynamicTableApp
 
 from datetime import datetime
 from src.cli.promp.modalidade import file_path_prompt
@@ -25,6 +26,10 @@ class ModalidadeController:
                 break
 
             match choice:
+
+                case "Visualizar Modalidades":
+                    self._handle_visualizar_modalidades()
+                    break
 
                 case "Baixar Modelo em Branco (.xlsx)":
                     self._handle_exportar_modelo()
@@ -127,3 +132,15 @@ class ModalidadeController:
 
         logger.info("Planilha de Todas as Modalidades exportada com Sucesso!")
         logger.info(f"Quantidade de registros exportados {len(all_modalidades)}")
+
+    #
+    #
+    #
+    #
+    #
+    #
+    @handle_exceptions
+    def _handle_visualizar_modalidades(self):
+        all_modalidades = self.service.pegar_todas_modalidades(to_dict=True)
+        DynamicTableApp(data=all_modalidades).run()
+        logger.info("Visualização feito com Sucesso!")
