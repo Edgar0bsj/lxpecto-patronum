@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from src.module.util.dynamic_table import DynamicTableApp
+from module.modalidade.tabela.tabela_modalidade import ModalidadeTable
 
 from datetime import datetime
 from src.cli.promp.modalidade import file_path_prompt
@@ -41,9 +41,6 @@ class ModalidadeController:
                     break
 
                 case "Exportar Dados Cadastrados":
-                    # -----------------------------------------
-                    # EM DESENVOLVIMENTO
-                    # -----------------------------------------
                     self._handle_exportar_all_data()
                     input()
 
@@ -141,6 +138,11 @@ class ModalidadeController:
     #
     @handle_exceptions
     def _handle_visualizar_modalidades(self):
-        all_modalidades = self.service.pegar_todas_modalidades(to_dict=True)
-        DynamicTableApp(data=all_modalidades).run()
+        all_modalidades = self.service.pegar_todas_modalidades(to_dict=False)
+        data = [(e.nome, e.codigo, e.tipo_modalidade) for e in all_modalidades]
+
+        table = ModalidadeTable()
+        table.sett_data(data)
+        table.run()
+
         logger.info("Visualização feito com Sucesso!")
