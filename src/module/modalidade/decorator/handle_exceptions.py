@@ -1,9 +1,8 @@
 from functools import wraps
-import logging
-
 from pydantic import ValidationError
-
 from src.module.modalidade.errs.handle_errs import ModalidadeValidationError
+
+import logging
 
 logger = logging.getLogger(__name__)
 

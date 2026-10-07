@@ -1,4 +1,5 @@
-import logging
+from src.config.logging import setup_logging
+
 from pathlib import Path
 import sys
 
@@ -10,11 +11,7 @@ from src.module.modalidade.controller import ModalidadeController
 from src.cli.prompts import main_menu_prompt
 from src.module.util.clear_terminal import clear_terminal
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(message)s",
-    datefmt="%H:%M:%S",
-)
+setup_logging()
 
 
 def main():

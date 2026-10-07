@@ -9,11 +9,6 @@ from src.module.modalidade.decorator.handle_exceptions import handle_exceptions
 from src.module.modalidade.errs.handle_errs import ModalidadeValidationError
 
 
-import logging
-
-logger = logging.getLogger(__name__)
-
-
 class ModalidadeController:
     def __init__(self):
         self.service = Service()
@@ -91,7 +86,7 @@ class ModalidadeController:
 
         created_cont, updated_cont = self.service.import_all_sicronize(list_mod_dto)
 
-        logger.info(f"Modalidade Novas: {created_cont}")
-        logger.info(f"Modalidade Atualizadas: {updated_cont}")
+        print(f"Modalidade Novas: {created_cont}")
+        print(f"Modalidade Atualizadas: {updated_cont}")
 
         input()
