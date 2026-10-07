@@ -75,3 +75,17 @@ class Service:
         result = self.repo.find_by_last_update()
 
         return result
+
+    def export_modelo(self):
+        tamplete_mod = [
+            {
+                "nome": "",
+                "codigo": "",
+                "tipo_de_modalidade": "",
+            }
+        ]
+
+        df = pd.DataFrame(tamplete_mod)
+
+        df.to_excel("1.modalidades.xlsx", index=False)
+        return

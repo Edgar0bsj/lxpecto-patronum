@@ -1,4 +1,3 @@
-from functools import wraps
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -8,7 +7,9 @@ def setup_logging():
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
 
-    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+    formatter = logging.Formatter(
+        fmt="%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    )
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)

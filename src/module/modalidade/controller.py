@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from src.cli.promp.modalidade import file_path_prompt
@@ -7,6 +8,8 @@ import pandas as pd
 
 from src.module.modalidade.decorator.handle_exceptions import handle_exceptions
 from src.module.modalidade.errs.handle_errs import ModalidadeValidationError
+
+logger = logging.getLogger(__name__)
 
 
 class ModalidadeController:
@@ -23,7 +26,7 @@ class ModalidadeController:
             match choice:
 
                 case "Baixar Modelo em Branco (.xlsx)":
-                    print("EM DESENVOLVIMENTO")
+                    self._handle_exportar_modelo()
                     input()
                     break
 
@@ -90,3 +93,14 @@ class ModalidadeController:
         print(f"Modalidade Atualizadas: {updated_cont}")
 
         input()
+
+    #
+    #
+    #
+    #
+    #
+    #
+    @handle_exceptions
+    def _handle_exportar_modelo(self):
+        self.service.export_modelo()
+        logger.info("Modelo feito com Sucesso!")
