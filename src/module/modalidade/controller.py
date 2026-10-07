@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+from datetime import datetime
 from src.cli.promp.modalidade import file_path_prompt
 from src.cli.promp.modalidade import modalidade_menu_prompt
 from src.module.modalidade.service import Service
@@ -35,7 +36,10 @@ class ModalidadeController:
                     break
 
                 case "Exportar Dados Cadastrados":
-                    print("EM DESENVOLVIMENTO")
+                    # -----------------------------------------
+                    # EM DESENVOLVIMENTO
+                    # -----------------------------------------
+                    self._handle_exportar_all_data()
                     input()
 
                     break
@@ -104,3 +108,22 @@ class ModalidadeController:
     def _handle_exportar_modelo(self):
         self.service.export_modelo()
         logger.info("Modelo feito com Sucesso!")
+
+    #
+    #
+    #
+    #
+    #
+    #
+    @handle_exceptions
+    def _handle_exportar_all_data(self):
+        all_modalidades = self.service.pegar_todas_modalidades(to_dict=True)
+
+        df = pd.DataFrame(all_modalidades)
+
+        arquivo_name = f"1.modalidades_{datetime.now():%Y-%m-%d}.xlsx"
+
+        df.to_excel(arquivo_name, index=False)
+
+        logger.info("Planilha de Todas as Modalidades exportada com Sucesso!")
+        logger.info(f"Quantidade de registros exportados {len(all_modalidades)}")

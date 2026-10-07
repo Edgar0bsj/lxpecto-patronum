@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from pydantic import BaseModel, field_validator, Field
@@ -28,3 +29,10 @@ class ModalidadeDto(BaseModel):
     @classmethod
     def normalizar_codigo(cls, value: str) -> str:
         return value.strip().lower()
+
+
+@dataclass
+class MoldalidadeResponseDto:
+    nome: str
+    codigo: str
+    tipo_modalidade: str
