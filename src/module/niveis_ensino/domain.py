@@ -1,83 +1,26 @@
-from pathlib import Path
+from src.database.database import Base
 
-from pydantic import BaseModel, field_validator
-from enum import Enum
-import pandas as pd
-
-
-class TipoNivel(str, Enum):
-    GRADUACAO = "GRADUACAO"
-    POS_GRADUACAO = "POS_GRADUACAO"
-    ENSINO_MEDIO = "ENSINO_MEDIO"
-    CURSO_DE_EXTERNSAO = "CURSO_DE_EXTERNSAO"
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+from datetime import datetime
+from sqlalchemy import DateTime, String
 
 
-class NivelEnsino(BaseModel):
-    nome: str
-    codigo: str
-    tipo_nivel: TipoNivel
+class NivelDeEnsino(Base):
+    __tablename__ = "nivel_de_ensino"
 
-    # =========================================
-    # CREATER
-    # =========================================
-    @classmethod
-    def read_excel(
-        cls,
-        file_path: Path,
-        aba="1.2 Niveis Ensino",
-        colls={
-            "nome": "Nome *",
-            "codigo": "Código *",
-            "tipo_nivel": "Tipo de Nível *",
-        },
-    ) -> list["NivelEnsino"]:
-        df = pd.read_excel(file_path, sheet_name=aba)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-        box = []
-        for _, v in df.iterrows():
-            entity = cls(
-                nome=v[colls["nome"]],
-                codigo=v[colls["codigo"]],
-                tipo_nivel=v[colls["tipo_nivel"]],
-            )
-            box.append(entity)
+    nome: Mapped[str] = mapped_column(String(50), nullable=False)
 
-        return box
+    codigo: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
 
-    # =========================================
-    # TO MANAGER
-    # =========================================
-    def to_manager(self) -> dict:
+    tipo_nivel: Mapped[str] = mapped_column(String(50), nullable=False)
 
-        type_nivel = None
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now, nullable=False
+    )
 
-        if self.tipo_nivel is TipoNivel.GRADUACAO:
-            type_nivel = "graduate"
-
-        if self.tipo_nivel is TipoNivel.POS_GRADUACAO:
-            type_nivel = "blended_learning "
-
-        if self.tipo_nivel is TipoNivel.ENSINO_MEDIO:
-            type_nivel = "high_school"
-
-        if self.tipo_nivel is TipoNivel.CURSO_DE_EXTERNSAO:
-            type_nivel = "extension_course"
-
-        return {
-            "name": self.nome,
-            "externalId": self.codigo,
-            "educationLevelTypeId": type_nivel,
-        }
-
-    # =========================================
-    # VALIDATORS
-    # =========================================
-    @field_validator("nome")
-    @classmethod
-    def normalizar_nome(cls, value: str) -> str:
-        return value.strip().lower()
-
-    @field_validator("codigo")
-    @classmethod
-    def normalizar_codigo(cls, value: str) -> str:
-        return value.strip().lower()
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now, onupdate=datetime.now, nullable=False
+    )

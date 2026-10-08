@@ -5,7 +5,7 @@ def main_menu_prompt() -> str:
     return questionary.select(
         "-- MENU --",
         instruction=" ",
-        choices=["Parametros", "Modalidade", "Sair"],
+        choices=["Parametros", "Modalidade", "Nivel de Ensino", "Sair"],
     ).ask()
 
 
