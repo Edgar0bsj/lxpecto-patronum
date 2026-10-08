@@ -7,6 +7,10 @@ from src.module.modalidade.repository import Repository
 from pandas import DataFrame
 from src.module.modalidade.dto import MoldalidadeResponseDto
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Service:
     def __init__(self):
@@ -141,3 +145,21 @@ class Service:
             ]
 
         return result
+
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    def excluir_modalidade(self, cod: str) -> bool:
+        mod = self.repo.find_by_cod(cod)
+
+        if not mod:
+            logger.error(f"Modalidade com o Código {cod} não encontrado!")
+            return False
+
+        self.repo.delete(mod.id)
+        logger.info(f"Modalidade:{mod.nome} Deletado com Sucesso! ")
+        return True

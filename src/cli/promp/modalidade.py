@@ -10,7 +10,7 @@ def modalidade_menu_prompt() -> str:
             "Baixar Modelo em Branco (.xlsx)",
             "Importar Dados do Excel",
             "Exportar Dados Cadastrados",
-            "Excluir Dados via Excel",
+            "Excluir Modalidade",
             "Voltar ao Menu Principal",
         ],
     ).ask()

@@ -23,7 +23,7 @@ class ModalidadeTable(App):
     def on_mount(self) -> None:
         table = self.query_one(DataTable)
         table.cursor_type = "row"
-        table.add_columns("Nome", "Codigo", "Tipo Modalidade")
+        table.add_columns("Nome", "Codigo", "Tipo da Modalidade")
 
         self.atualizar_tabela(self.dados_originais)
 

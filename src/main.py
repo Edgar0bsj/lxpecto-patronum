@@ -15,6 +15,7 @@ setup_logging()
 
 
 def main():
+    clear_terminal()
     file_path = Path("Planilha_Mestre.xlsx")
 
     parametroController = ParametroController()

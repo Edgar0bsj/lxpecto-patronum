@@ -1,10 +1,12 @@
 import logging
 from pathlib import Path
-from module.modalidade.tabela.tabela_modalidade import ModalidadeTable
+from src.module.modalidade.tabela.tabela_modalidade import ModalidadeTable
 
 from datetime import datetime
-from src.cli.promp.modalidade import file_path_prompt
-from src.cli.promp.modalidade import modalidade_menu_prompt
+from src.cli.promp.modalidade import (
+    modalidade_menu_prompt,
+    file_path_prompt,
+)
 from src.module.modalidade.service import Service
 import pandas as pd
 
@@ -46,8 +48,8 @@ class ModalidadeController:
 
                     break
 
-                case "Excluir Dados via Excel":
-                    print("EM DESENVOLVIMENTO")
+                case "Excluir Modalidade":
+                    self._handle_deletar_modalidade()
                     input()
 
                     break
@@ -146,3 +148,33 @@ class ModalidadeController:
         table.run()
 
         logger.info("Visualização feito com Sucesso!")
+
+    #
+    #
+    #
+    #
+    #
+    #
+    @handle_exceptions
+    def _handle_deletar_modalidade(self):
+        print('A planilha deve ter o Coluna "modalidade_delete_codigo"\'')
+        file_path = file_path_prompt()
+        file_path = Path(file_path)
+
+        if not file_path.exists():
+            raise ModalidadeValidationError(message="Caminha inválido", field="Path")
+
+        if file_path.suffix != ".xlsx":
+            raise ModalidadeValidationError(
+                message="Tipo de arquivo incompativel", field=file_path.suffix
+            )
+
+        mod_del_cod = pd.read_excel(file_path).to_dict("records")
+
+        box_cod: list[str] = []
+
+        for i in mod_del_cod:
+            mod_cod = i["modalidade_delete_codigo"]
+            box_cod.append(str(mod_cod).strip().lower())
+
+        [self.service.excluir_modalidade(e) for e in box_cod]
