@@ -8,7 +8,7 @@ from rich.panel import Panel
 
 from src.module.parametros.controller import ParametroController
 from src.module.modalidade.controller import ModalidadeController
-from src.cli.prompts import main_menu_prompt
+from src.cli.promp.parametro import main_menu_prompt
 from src.module.util.clear_terminal import clear_terminal
 
 setup_logging()

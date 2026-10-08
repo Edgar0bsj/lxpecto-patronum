@@ -1,12 +1,11 @@
 from src.database.database import create_database
-from src.cli.prompts import (
+from src.cli.promp.parametro import (
     parametros_menu_prompt,
     edit_parametros_form,
     delete_parametros_confim,
 )
 from src.module.parametros.service import Service
-from src.module.parametros.model import Parametros
-from src.cli.prompts import get_parametros_form
+from src.cli.promp.parametro import get_parametros_form
 from src.module.parametros.dto import ParametrosDto
 from src.module.parametros.decorator.handle_exceptions import handle_exceptions
 
