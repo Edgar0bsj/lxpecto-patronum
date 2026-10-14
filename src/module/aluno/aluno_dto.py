@@ -7,26 +7,8 @@ from pydantic import BaseModel, Field, field_validator
 class AlunoRequest(BaseModel):
     nome: Annotated[str, Field(min_length=3, max_length=150)]
     cpf: Annotated[str, Field(min_length=11, max_length=11)]
-    email: Annotated[str, Field(min_length=3, max_length=100)]
     login: Annotated[str, Field(min_length=3, max_length=100)]
     senha: Annotated[str, Field(min_length=3, max_length=100)]
-    isAtivo: bool
-
-    #
-    #
-    #
-    #
-    #
-    # @field_validator("matricula", mode="before")
-    # @classmethod
-    # def normalizar_matricula(cls, value: Any) -> str:
-    #     if value is None:
-    #         raise ValueError("O matricula não pode ser vazio.")
-
-    #     val_str = str(value).strip().lower()
-    #     val_str = re.sub(r"\.0+$", "", val_str)
-
-    #     return val_str
 
     #
     #
@@ -74,33 +56,6 @@ class AlunoRequest(BaseModel):
     #
     #
     #
-    #
-    #
-    #
-    @field_validator("email", mode="before")
-    @classmethod
-    def normalizar_email(cls, value: Any) -> str:
-        if not value:
-            raise ValueError("O e-mail não pode ser vazio.")
-
-        val_str = str(value).strip()
-
-        email_limpo = val_str.lower()
-
-        regex_email = r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-
-        if not re.match(regex_email, email_limpo):
-            raise ValueError("O e-mail informado possui um formato inválido.")
-
-        return email_limpo
-
-    #
-    #
-    #
-    #
-    #
-    #
-    #
     @field_validator("login", mode="before")
     @classmethod
     def normalizar_login(cls, value: Any) -> str:
@@ -127,21 +82,6 @@ class AlunoRequest(BaseModel):
 
         return val_str
 
-    #
-    #
-    #
-    #
-    #
-    @field_validator("isAtivo", mode="before")
-    @classmethod
-    def normalizar_isAtivo(cls, value: Any) -> bool:
-        if value is None:
-            return False
-
-        val_bool = bool(value)
-
-        return val_bool
-
 
 #
 #
@@ -157,6 +97,4 @@ class AlunoFiltro(BaseModel):
     )
 
     cpf: str | None = Field(None, description="Filtrar por parte do cpf")
-    email: str | None = Field(None, description="Filtrar por parte do email")
     login: str | None = Field(None, description="Filtrar por parte do login")
-    isAtivo: bool | None = Field(None, description="Filtrar por status")

@@ -1,6 +1,6 @@
 from src.database.db_config import Base
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from sqlalchemy import DateTime, String, Integer, Boolean
 
@@ -18,13 +18,19 @@ class AlunoModel(Base):
 
     cpf: Mapped[str] = mapped_column(String(11), nullable=False, unique=True)
 
-    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-
     login: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
 
     senha: Mapped[str] = mapped_column(String(100), nullable=True)
 
-    isAtivo: Mapped[bool] = mapped_column(Boolean, default=False)
+    #
+    #
+    # Relacionamento Vinculo
+    vinculo: Mapped[list["VinculoModel"]] = relationship(  # type: ignore
+        back_populates="aluno", cascade="all"
+    )
+    # ================
+    #
+    #
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.now, nullable=False

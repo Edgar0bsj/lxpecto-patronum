@@ -33,6 +33,7 @@ async def create_aluno(
         )
 
     except Exception as err:
+        raise
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Putz... Error inesperado meu nobre",

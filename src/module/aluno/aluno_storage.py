@@ -1,6 +1,7 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
-from src.module.aluno.aluno_dto import AlunoFiltro
+from src.module.aluno.aluno_dto import AlunoFiltro, AlunoRequest
 from src.database.db_config import create_database, SessionLocal
 from src.module.aluno.aluno_model import AlunoModel
 
@@ -13,29 +14,17 @@ class AlunoStorage:
     #
     #
     #
-    def create(
-        self,
-        id: str,
-        nome: str,
-        codigo_externo: str,
-        cpf: int,
-        email: str,
-        login: str,
-        senha: str,
-        isAtivo: bool,
-    ) -> "AlunoModel":
+    def create(self, id: str, aluno_dto: AlunoRequest) -> "AlunoModel":
 
         with SessionLocal() as session:
 
             aluno = AlunoModel(
                 id=id,
-                nome=nome,
-                codigo_externo=codigo_externo,
-                cpf=cpf,
-                email=email,
-                login=login,
-                senha=senha,
-                isAtivo=isAtivo,
+                nome=aluno_dto.nome,
+                codigo_externo=aluno_dto.cpf,
+                cpf=aluno_dto.cpf,
+                login=aluno_dto.login,
+                senha=aluno_dto.senha,
             )
 
             session.add(aluno)
@@ -49,17 +38,7 @@ class AlunoStorage:
     #
     #
     #
-    def update(
-        self,
-        id: str,
-        nome: str,
-        codigo_externo: str,
-        cpf: int,
-        email: str,
-        login: str,
-        senha: str,
-        isAtivo: bool,
-    ) -> "AlunoModel":
+    def update(self, id: str, aluno_dto: AlunoRequest) -> "AlunoModel":
 
         with SessionLocal() as session:
 
@@ -68,13 +47,11 @@ class AlunoStorage:
             if not aluno:
                 return None
 
-            aluno.nome = nome
-            aluno.codigo_externo = codigo_externo
-            aluno.cpf = cpf
-            aluno.email = email
-            aluno.login = login
-            aluno.senha = senha
-            aluno.isAtivo = isAtivo
+            aluno.nome = aluno_dto.nome
+            aluno.codigo_externo = aluno_dto.codigo_externo
+            aluno.cpf = aluno_dto.cpf
+            aluno.login = aluno_dto.login
+            aluno.senha = aluno_dto.senha
 
             session.commit()
             session.refresh(aluno)
@@ -88,7 +65,7 @@ class AlunoStorage:
     def find_all(self, aluno_filtro: AlunoFiltro) -> list["AlunoModel"]:
         with SessionLocal() as session:
 
-            statement = select(AlunoModel)
+            statement = select(AlunoModel).options(selectinload(AlunoModel.vinculo))
 
             if aluno_filtro.nome:
                 statement = statement.where(
@@ -105,19 +82,9 @@ class AlunoStorage:
                     AlunoModel.cpf.ilike(f"%{aluno_filtro.cpf}%")
                 )
 
-            if aluno_filtro.email:
-                statement = statement.where(
-                    AlunoModel.email.ilike(f"%{aluno_filtro.email}%")
-                )
-
             if aluno_filtro.login:
                 statement = statement.where(
                     AlunoModel.login.ilike(f"%{aluno_filtro.login}%")
-                )
-
-            if aluno_filtro.isAtivo is not None:
-                statement = select(AlunoModel).where(
-                    AlunoModel.isAtivo == aluno_filtro.isAtivo
                 )
 
             alunos = session.scalars(statement).all()
@@ -131,7 +98,16 @@ class AlunoStorage:
     def find_by_id(self, id: str) -> "AlunoModel":
 
         with SessionLocal() as session:
-            return session.get(AlunoModel, id)
+
+            statement = (
+                select(AlunoModel)
+                .options(selectinload(AlunoModel.vinculo))
+                .where(AlunoModel.id == id)
+            )
+
+            aluno = session.scalars(statement).first()
+
+            return aluno
 
     #
     #
@@ -150,31 +126,3 @@ class AlunoStorage:
             session.commit()
 
             return True
-
-    #
-    #
-    #
-    #
-    def find_by_cod_externo(self, codigo_externo: str) -> "AlunoModel":
-
-        with SessionLocal() as session:
-            statement = select(AlunoModel).where(
-                AlunoModel.codigo_externo == codigo_externo
-            )
-
-            aluno = session.scalar(statement)
-
-            return aluno
-
-    #
-    #
-    #
-    #
-    def find_by_nome(self, nome: str) -> list["AlunoModel"]:
-
-        with SessionLocal() as session:
-            statement = select(AlunoModel).where(AlunoModel.nome.ilike(f"%{nome}%"))
-
-            alunos = session.scalars(statement).all()
-
-            return alunos

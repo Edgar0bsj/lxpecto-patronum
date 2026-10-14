@@ -18,16 +18,7 @@ class AlunoService:
         token = generate(size=10)
         id = f"aluno_{aluno_dto.cpf[-3:]}{token}"
 
-        aluno = self.repo.create(
-            id=id,
-            nome=aluno_dto.nome,
-            codigo_externo=aluno_dto.cpf,
-            cpf=aluno_dto.cpf,
-            email=aluno_dto.email,
-            login=aluno_dto.login,
-            senha=aluno_dto.senha,
-            isAtivo=aluno_dto.isAtivo,
-        )
+        aluno = self.repo.create(id=id, aluno_dto=aluno_dto)
 
         return aluno
 
@@ -38,16 +29,7 @@ class AlunoService:
     #
     #
     def update_aluno(self, id: str, aluno_dto: AlunoRequest):
-        return self.repo.update(
-            id=id,
-            nome=aluno_dto.nome,
-            codigo_externo=aluno_dto.cpf,
-            cpf=aluno_dto.cpf,
-            email=aluno_dto.email,
-            login=aluno_dto.login,
-            senha=aluno_dto.senha,
-            isAtivo=aluno_dto.isAtivo,
-        )
+        return self.repo.update(id=id, aluno_dto=aluno_dto)
 
     #
     #
