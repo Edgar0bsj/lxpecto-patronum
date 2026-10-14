@@ -1,5 +1,6 @@
 from sqlalchemy import select
 
+from src.module.aluno.aluno_dto import AlunoFiltro
 from src.database.db_config import create_database, SessionLocal
 from src.module.aluno.aluno_model import AlunoModel
 
@@ -88,10 +89,44 @@ class AlunoStorage:
     #
     #
     #
-    def find_all(self) -> list["AlunoModel"]:
+    def find_all(self, aluno_filtro: AlunoFiltro) -> list["AlunoModel"]:
         with SessionLocal() as session:
 
             statement = select(AlunoModel)
+            if aluno_filtro.matricula:
+                statement = statement.where(
+                    AlunoModel.matricula.ilike(f"%{aluno_filtro.matricula}%")
+                )
+
+            if aluno_filtro.nome:
+                statement = statement.where(
+                    AlunoModel.nome.ilike(f"%{aluno_filtro.nome}%")
+                )
+
+            if aluno_filtro.codigo_externo:
+                statement = statement.where(
+                    AlunoModel.codigo_externo.ilike(f"%{aluno_filtro.codigo_externo}%")
+                )
+
+            if aluno_filtro.cpf:
+                statement = statement.where(
+                    AlunoModel.cpf.ilike(f"%{aluno_filtro.cpf}%")
+                )
+
+            if aluno_filtro.email:
+                statement = statement.where(
+                    AlunoModel.email.ilike(f"%{aluno_filtro.email}%")
+                )
+
+            if aluno_filtro.login:
+                statement = statement.where(
+                    AlunoModel.login.ilike(f"%{aluno_filtro.login}%")
+                )
+
+            if aluno_filtro.isAtivo is not None:
+                statement = select(AlunoModel).where(
+                    AlunoModel.isAtivo == aluno_filtro.isAtivo
+                )
 
             alunos = session.scalars(statement).all()
 
@@ -135,6 +170,19 @@ class AlunoStorage:
                 AlunoModel.codigo_externo == codigo_externo
             )
 
-            relogio = session.scalar(statement)
+            aluno = session.scalar(statement)
 
-            return relogio
+            return aluno
+
+    #
+    #
+    #
+    #
+    def find_by_nome(self, nome: str) -> list["AlunoModel"]:
+
+        with SessionLocal() as session:
+            statement = select(AlunoModel).where(AlunoModel.nome.ilike(f"%{nome}%"))
+
+            alunos = session.scalars(statement).all()
+
+            return alunos

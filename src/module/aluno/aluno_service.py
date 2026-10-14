@@ -1,6 +1,6 @@
 from src.module.aluno.aluno_model import AlunoModel
 from src.module.aluno.aluno_storage import AlunoStorage
-from src.module.aluno.aluno_dto import AlunoRequest
+from src.module.aluno.aluno_dto import AlunoFiltro, AlunoRequest
 from nanoid import generate
 
 
@@ -16,13 +16,13 @@ class AlunoService:
     #
     def create_aluno(self, aluno_dto: AlunoRequest):
         token = generate(size=10)
-        id = f"aluno_{token}"
+        id = f"aluno_{aluno_dto.cpf[-3:]}{token}"
 
         aluno = self.repo.create(
             id=id,
             matricula=aluno_dto.matricula,
             nome=aluno_dto.nome,
-            codigo_externo=aluno_dto.codigo_externo,
+            codigo_externo=aluno_dto.cpf,
             cpf=aluno_dto.cpf,
             email=aluno_dto.email,
             login=aluno_dto.login,
@@ -43,7 +43,7 @@ class AlunoService:
             id=id,
             matricula=aluno_dto.matricula,
             nome=aluno_dto.nome,
-            codigo_externo=aluno_dto.codigo_externo,
+            codigo_externo=aluno_dto.cpf,
             cpf=aluno_dto.cpf,
             email=aluno_dto.email,
             login=aluno_dto.login,
@@ -57,8 +57,8 @@ class AlunoService:
     #
     #
     #
-    def find_all(self) -> list[AlunoModel]:
-        return self.repo.find_all()
+    def find_all(self, aluno_filtro: AlunoFiltro) -> list[AlunoModel]:
+        return self.repo.find_all(aluno_filtro)
 
     #
     #
@@ -86,3 +86,12 @@ class AlunoService:
     #
     def find_by_cod_externo(self, codigo_externo: str) -> AlunoModel:
         return self.repo.find_by_cod_externo(codigo_externo)
+
+    #
+    #
+    #
+    #
+    #
+    #
+    def find_by_nome(self, nome: str) -> list["AlunoModel"]:
+        return self.repo.find_by_nome(nome)
