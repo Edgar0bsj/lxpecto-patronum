@@ -20,7 +20,6 @@ class AlunoService:
 
         aluno = self.repo.create(
             id=id,
-            matricula=aluno_dto.matricula,
             nome=aluno_dto.nome,
             codigo_externo=aluno_dto.cpf,
             cpf=aluno_dto.cpf,
@@ -41,7 +40,6 @@ class AlunoService:
     def update_aluno(self, id: str, aluno_dto: AlunoRequest):
         return self.repo.update(
             id=id,
-            matricula=aluno_dto.matricula,
             nome=aluno_dto.nome,
             codigo_externo=aluno_dto.cpf,
             cpf=aluno_dto.cpf,

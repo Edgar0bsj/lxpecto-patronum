@@ -16,7 +16,6 @@ class AlunoStorage:
     def create(
         self,
         id: str,
-        matricula: str,
         nome: str,
         codigo_externo: str,
         cpf: int,
@@ -30,7 +29,6 @@ class AlunoStorage:
 
             aluno = AlunoModel(
                 id=id,
-                matricula=matricula,
                 nome=nome,
                 codigo_externo=codigo_externo,
                 cpf=cpf,
@@ -54,7 +52,6 @@ class AlunoStorage:
     def update(
         self,
         id: str,
-        matricula: str,
         nome: str,
         codigo_externo: str,
         cpf: int,
@@ -71,7 +68,6 @@ class AlunoStorage:
             if not aluno:
                 return None
 
-            aluno.matricula = matricula
             aluno.nome = nome
             aluno.codigo_externo = codigo_externo
             aluno.cpf = cpf
@@ -93,10 +89,6 @@ class AlunoStorage:
         with SessionLocal() as session:
 
             statement = select(AlunoModel)
-            if aluno_filtro.matricula:
-                statement = statement.where(
-                    AlunoModel.matricula.ilike(f"%{aluno_filtro.matricula}%")
-                )
 
             if aluno_filtro.nome:
                 statement = statement.where(

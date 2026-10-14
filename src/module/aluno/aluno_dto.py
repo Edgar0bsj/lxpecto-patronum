@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class AlunoRequest(BaseModel):
-    matricula: Annotated[str, Field(min_length=3, max_length=50)]
     nome: Annotated[str, Field(min_length=3, max_length=150)]
     cpf: Annotated[str, Field(min_length=11, max_length=11)]
     email: Annotated[str, Field(min_length=3, max_length=100)]
@@ -18,16 +17,16 @@ class AlunoRequest(BaseModel):
     #
     #
     #
-    @field_validator("matricula", mode="before")
-    @classmethod
-    def normalizar_matricula(cls, value: Any) -> str:
-        if value is None:
-            raise ValueError("O matricula não pode ser vazio.")
+    # @field_validator("matricula", mode="before")
+    # @classmethod
+    # def normalizar_matricula(cls, value: Any) -> str:
+    #     if value is None:
+    #         raise ValueError("O matricula não pode ser vazio.")
 
-        val_str = str(value).strip().lower()
-        val_str = re.sub(r"\.0+$", "", val_str)
+    #     val_str = str(value).strip().lower()
+    #     val_str = re.sub(r"\.0+$", "", val_str)
 
-        return val_str
+    #     return val_str
 
     #
     #
@@ -152,7 +151,6 @@ class AlunoRequest(BaseModel):
 #
 #
 class AlunoFiltro(BaseModel):
-    matricula: str | None = Field(None, description="Filtrar por parte da matricula")
     nome: str | None = Field(None, description="Filtrar por parte do nome")
     codigo_externo: str | None = Field(
         None, description="Filtrar por parte do codigo externo"

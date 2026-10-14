@@ -10,8 +10,6 @@ class AlunoModel(Base):
 
     id: Mapped[str] = mapped_column(primary_key=True)
 
-    matricula: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-
     nome: Mapped[str] = mapped_column(String(150), nullable=False)
 
     codigo_externo: Mapped[str] = mapped_column(
