@@ -64,8 +64,8 @@ class AlunoService:
     #
     #
     #
-    def find_by_cod_externo(self, codigo_externo: str) -> AlunoModel:
-        return self.repo.find_by_cod_externo(codigo_externo)
+    def find_by_cpf(self, cpf: str) -> AlunoModel:
+        return self.repo.find_by_cpf(cpf)
 
     #
     #
@@ -73,5 +73,39 @@ class AlunoService:
     #
     #
     #
-    def find_by_nome(self, nome: str) -> list["AlunoModel"]:
-        return self.repo.find_by_nome(nome)
+    def parse_and_validate_rows(
+        self,
+        aluno_row: list[dict],
+        col_nome="nome",
+        col_cpf="cpf",
+        col_login="login",
+        col_senha="senha",
+    ) -> tuple[list[AlunoRequest], list[dict]]:
+
+        _buffer_alunos: list[AlunoRequest] = []
+        _buffer_alunos_err: list[dict] = []
+
+        for aluno in aluno_row:
+            nome = aluno[col_nome]
+            cpf = aluno[col_cpf]
+            login = aluno[col_login]
+            senha = aluno[col_senha]
+
+            try:
+                _buffer_alunos.append(
+                    AlunoRequest(nome=nome, cpf=cpf, login=login, senha=senha)
+                )
+
+            except:
+                _buffer_alunos_err.append(
+                    {
+                        "nome": nome,
+                        "cpf": cpf,
+                        "login": login,
+                        "senha": senha,
+                        "detalhes": "Error de validação",
+                    }
+                )
+                continue
+
+        return (_buffer_alunos, _buffer_alunos_err)

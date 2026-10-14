@@ -48,7 +48,7 @@ class AlunoStorage:
                 return None
 
             aluno.nome = aluno_dto.nome
-            aluno.codigo_externo = aluno_dto.codigo_externo
+            aluno.codigo_externo = aluno_dto.cpf
             aluno.cpf = aluno_dto.cpf
             aluno.login = aluno_dto.login
             aluno.senha = aluno_dto.senha
@@ -126,3 +126,22 @@ class AlunoStorage:
             session.commit()
 
             return True
+
+    #
+    #
+    #
+    #
+    #
+    def find_by_cpf(self, cpf: str) -> "AlunoModel":
+
+        with SessionLocal() as session:
+
+            statement = (
+                select(AlunoModel)
+                .options(selectinload(AlunoModel.vinculo))
+                .where(AlunoModel.cpf == cpf)
+            )
+
+            aluno = session.scalars(statement).first()
+
+            return aluno
