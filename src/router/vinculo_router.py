@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from sqlalchemy.exc import IntegrityError
 
@@ -108,6 +108,72 @@ async def delete_vinculo(
         return {"msg": "Vinculo deletado com sucesso!"}
 
     except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Putz... Error inesperado meu nobre",
+        )
+
+
+#
+#
+#
+#
+@router.get("/export-tamplete-xlsx/", status_code=status.HTTP_200_OK)
+async def export_excel_vinculo_tamplete(
+    controller: VinculoController = Depends(get_controller),
+):
+
+    try:
+
+        iterfile = await controller.export_excel_tamplete()
+
+        return StreamingResponse(
+            iterfile(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": "attachment; filename=tamplete_vinculo.xlsx"
+            },
+        )
+
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(err),
+        )
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Putz... Error inesperado meu nobre",
+        )
+
+
+#
+#
+#
+#
+@router.post("/importar-excel/", status_code=status.HTTP_200_OK)
+async def importar_excel_aluno(
+    file: UploadFile = File(...),
+    controller: VinculoController = Depends(get_controller),
+):
+
+    try:
+
+        iterfile = await controller.import_excel_vinculo(file)
+
+        return StreamingResponse(
+            iterfile(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=vinculo_errs.xlsx"},
+        )
+
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(err),
+        )
+    except Exception as err:
+        raise
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Putz... Error inesperado meu nobre",
