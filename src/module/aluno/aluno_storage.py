@@ -21,10 +21,7 @@ class AlunoStorage:
             aluno = AlunoModel(
                 id=id,
                 nome=aluno_dto.nome,
-                codigo_externo=aluno_dto.cpf,
                 cpf=aluno_dto.cpf,
-                login=aluno_dto.login,
-                senha=aluno_dto.senha,
             )
 
             session.add(aluno)
@@ -48,10 +45,7 @@ class AlunoStorage:
                 return None
 
             aluno.nome = aluno_dto.nome
-            aluno.codigo_externo = aluno_dto.cpf
             aluno.cpf = aluno_dto.cpf
-            aluno.login = aluno_dto.login
-            aluno.senha = aluno_dto.senha
 
             session.commit()
             session.refresh(aluno)
@@ -72,19 +66,9 @@ class AlunoStorage:
                     AlunoModel.nome.ilike(f"%{aluno_filtro.nome}%")
                 )
 
-            if aluno_filtro.codigo_externo:
-                statement = statement.where(
-                    AlunoModel.codigo_externo.ilike(f"%{aluno_filtro.codigo_externo}%")
-                )
-
             if aluno_filtro.cpf:
                 statement = statement.where(
                     AlunoModel.cpf.ilike(f"%{aluno_filtro.cpf}%")
-                )
-
-            if aluno_filtro.login:
-                statement = statement.where(
-                    AlunoModel.login.ilike(f"%{aluno_filtro.login}%")
                 )
 
             alunos = session.scalars(statement).all()
@@ -101,8 +85,8 @@ class AlunoStorage:
 
             statement = (
                 select(AlunoModel)
-                .options(selectinload(AlunoModel.vinculo))
                 .where(AlunoModel.id == id)
+                .options(selectinload(AlunoModel.vinculo))
             )
 
             aluno = session.scalars(statement).first()
@@ -138,8 +122,8 @@ class AlunoStorage:
 
             statement = (
                 select(AlunoModel)
-                .options(selectinload(AlunoModel.vinculo))
                 .where(AlunoModel.cpf == cpf)
+                .options(selectinload(AlunoModel.vinculo))
             )
 
             aluno = session.scalars(statement).first()

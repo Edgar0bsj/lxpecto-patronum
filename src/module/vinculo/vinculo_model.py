@@ -8,17 +8,19 @@ from sqlalchemy import DateTime, String, Boolean
 class VinculoModel(Base):
     __tablename__ = "vinculo"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, unique=True)
 
     matricula: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-
-    modalidade: Mapped[str] = mapped_column(String(100), nullable=False)
-
-    polo: Mapped[str] = mapped_column(String(50), nullable=False)
 
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
 
     status: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    login: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    senha: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
     #
     #
     # Relacionamento

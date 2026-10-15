@@ -78,8 +78,6 @@ class AlunoService:
         aluno_row: list[dict],
         col_nome="nome",
         col_cpf="cpf",
-        col_login="login",
-        col_senha="senha",
     ) -> tuple[list[AlunoRequest], list[dict]]:
 
         _buffer_alunos: list[AlunoRequest] = []
@@ -88,21 +86,15 @@ class AlunoService:
         for aluno in aluno_row:
             nome = aluno[col_nome]
             cpf = aluno[col_cpf]
-            login = aluno[col_login]
-            senha = aluno[col_senha]
 
             try:
-                _buffer_alunos.append(
-                    AlunoRequest(nome=nome, cpf=cpf, login=login, senha=senha)
-                )
+                _buffer_alunos.append(AlunoRequest(nome=nome, cpf=cpf))
 
             except:
                 _buffer_alunos_err.append(
                     {
                         "nome": nome,
                         "cpf": cpf,
-                        "login": login,
-                        "senha": senha,
                         "detalhes": "Error de validação",
                     }
                 )

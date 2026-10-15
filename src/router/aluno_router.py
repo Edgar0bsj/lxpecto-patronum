@@ -1,5 +1,3 @@
-import io
-
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from src.module.aluno.aluno_controller import AlunoController
 from src.module.aluno.aluno_dto import AlunoRequest

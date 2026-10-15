@@ -7,8 +7,6 @@ from pydantic import BaseModel, Field, field_validator
 class AlunoRequest(BaseModel):
     nome: Annotated[str, Field(min_length=3, max_length=150)]
     cpf: Annotated[str, Field(min_length=11, max_length=11)]
-    login: Annotated[str, Field(min_length=3, max_length=100)]
-    senha: Annotated[str, Field(min_length=3, max_length=100)]
 
     #
     #
@@ -52,36 +50,6 @@ class AlunoRequest(BaseModel):
 
         return cpf_limpo
 
-    #
-    #
-    #
-    #
-    @field_validator("login", mode="before")
-    @classmethod
-    def normalizar_login(cls, value: Any) -> str:
-        if value is None:
-            raise ValueError("O login não pode ser vazio.")
-
-        val_str = str(value).strip().lower()
-        val_str = re.sub(r"\.0+$", "", val_str)
-
-        return val_str
-
-    #
-    #
-    #
-    #
-    #
-    @field_validator("senha", mode="before")
-    @classmethod
-    def normalizar_senha(cls, value: Any) -> str:
-        if value is None:
-            return "Unig@2026"
-
-        val_str = str(value).strip()
-
-        return val_str
-
 
 #
 #
@@ -92,9 +60,4 @@ class AlunoRequest(BaseModel):
 #
 class AlunoFiltro(BaseModel):
     nome: str | None = Field(None, description="Filtrar por parte do nome")
-    codigo_externo: str | None = Field(
-        None, description="Filtrar por parte do codigo externo"
-    )
-
     cpf: str | None = Field(None, description="Filtrar por parte do cpf")
-    login: str | None = Field(None, description="Filtrar por parte do login")

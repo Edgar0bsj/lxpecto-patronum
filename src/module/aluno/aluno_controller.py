@@ -70,6 +70,8 @@ class AlunoController:
 
         df = pd.read_excel(io.BytesIO(contents))
 
+        df = df.fillna("")
+
         dados_alunos = df.to_dict(orient="records")
 
         alunos, alunos_err = self.service.parse_and_validate_rows(dados_alunos)
@@ -99,8 +101,6 @@ class AlunoController:
                     {
                         "nome": add_aluno.nome,
                         "cpf": add_aluno.cpf,
-                        "login": add_aluno.login,
-                        "senha": add_aluno.senha,
                         "detalhes": str(err.orig),
                     }
                 )
@@ -114,8 +114,6 @@ class AlunoController:
                     {
                         "nome": update_aluno["aluno"].nome,
                         "cpf": update_aluno["aluno"].cpf,
-                        "login": update_aluno["aluno"].login,
-                        "senha": update_aluno["aluno"].senha,
                         "detalhes": str(err.orig),
                     }
                 )
@@ -142,12 +140,12 @@ class AlunoController:
     #
     #
     async def export_excel_tamplete(self):
-        _tamplete = {
-            "nome": "",
-            "cpf": "",
-            "login": "",
-            "senha": "",
-        }
+        _tamplete = [
+            {
+                "nome": "",
+                "cpf": "",
+            }
+        ]
         df = pd.DataFrame(_tamplete)
         excel_buffer = io.BytesIO()
 

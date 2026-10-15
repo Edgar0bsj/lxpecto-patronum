@@ -21,11 +21,6 @@ class VinculoService:
         token = generate(size=10)
         id = f"vinc_{vinculo_dto.matricula[-3:]}{token}"
 
-        aluno = self.aluno_repo.find_by_id(vinculo_dto.aluno_id)
-
-        if not aluno:
-            raise ValueError("Aluno não existe!")
-
         aluno = self.repo.create(id, vinculo_dto)
 
         return aluno
@@ -37,12 +32,6 @@ class VinculoService:
     #
     #
     def update_vinculo(self, id: str, vinculo_dto: VinculoDto):
-
-        aluno = self.aluno_repo.find_by_id(vinculo_dto.aluno_id)
-
-        if not aluno:
-            raise ValueError("Aluno não existe!")
-
         return self.repo.update(id=id, vinculo_dto=vinculo_dto)
 
     #

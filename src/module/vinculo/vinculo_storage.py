@@ -22,10 +22,11 @@ class VinculoStorage:
             vinculo = VinculoModel(
                 id=id,
                 matricula=vinculo_dto.matricula,
-                modalidade=vinculo_dto.modalidade.value,
-                polo=vinculo_dto.polo.value,
                 email=vinculo_dto.email,
                 status=vinculo_dto.status,
+                login=vinculo_dto.login,
+                senha=vinculo_dto.senha,
+                is_primary=vinculo_dto.is_primary,
                 aluno_id=vinculo_dto.aluno_id,
             )
 
@@ -50,11 +51,12 @@ class VinculoStorage:
                 return None
 
             vinculo.matricula = vinculo_dto.matricula
-            vinculo.modalidade = vinculo_dto.modalidade.value
-            vinculo.polo = vinculo_dto.polo.value
             vinculo.email = vinculo_dto.email
             vinculo.status = vinculo_dto.status
-            aluno_id = (vinculo_dto.aluno_id,)
+            vinculo.login = vinculo_dto.login
+            vinculo.senha = vinculo_dto.senha
+            vinculo.is_primary = vinculo_dto.is_primary
+            vinculo.aluno_id = vinculo_dto.aluno_id
 
             session.commit()
             session.refresh(vinculo)
@@ -75,26 +77,24 @@ class VinculoStorage:
                     VinculoModel.matricula.ilike(f"%{vinculo_filtro.matricula}%")
                 )
 
-            if vinculo_filtro.modalidade:
-                statement = statement.where(
-                    VinculoModel.modalidade.ilike(
-                        f"%{vinculo_filtro.modalidade.value}%"
-                    )
-                )
-
-            if vinculo_filtro.polo:
-                statement = statement.where(
-                    VinculoModel.polo.ilike(f"%{vinculo_filtro.polo.value}%")
-                )
-
             if vinculo_filtro.email:
                 statement = statement.where(
                     VinculoModel.email.ilike(f"%{vinculo_filtro.email}%")
                 )
 
             if vinculo_filtro.status is not None:
-                statement = select(VinculoModel).where(
+                statement = statement.where(
                     VinculoModel.status == vinculo_filtro.status
+                )
+
+            if vinculo_filtro.login:
+                statement = statement.where(
+                    VinculoModel.login.ilike(f"%{vinculo_filtro.login}%")
+                )
+
+            if vinculo_filtro.is_primary is not None:
+                statement = statement.where(
+                    VinculoModel.is_primary == vinculo_filtro.is_primary
                 )
 
             vinculo = session.scalars(statement).all()

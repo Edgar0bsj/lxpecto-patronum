@@ -3,52 +3,18 @@ import re
 from pydantic import BaseModel, Field, field_validator
 from typing import Annotated, Any
 
-from enum import Enum
-
-
-class ModalidadeType(str, Enum):
-    EAD = "ead"
-    PRESENCIAL = "presencial"
-    SEMI_PRESENCIAL = "semi_presencial"
-
-
-class PoloType(str, Enum):
-    UNIG = "unig"
-    UNIG_HIBRIDO = "unig_hibrido"
-    ITAPERUNA = "itaperuna"
-    UNIABEL = "uniabel"
-    LIFE_UNIC = "life_unic"
-
 
 class VinculoDto(BaseModel):
     matricula: Annotated[str, Field(min_length=3, max_length=100)]
-    modalidade: ModalidadeType
-    polo: PoloType
     email: Annotated[str, Field(min_length=3, max_length=100)]
-    status: bool = True
+    status: bool
+    login: Annotated[str, Field(min_length=3, max_length=100)]
+    senha: Annotated[str, Field(min_length=3, max_length=100)]
+    is_primary: bool = False
 
-    aluno_id: str
+    # fk
+    aluno_id: Annotated[str, Field(min_length=3, max_length=100)]
 
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    @field_validator("matricula", mode="before")
-    @classmethod
-    def normalizar_matricula(cls, value: Any) -> str:
-        if value is None:
-            raise ValueError("O matricula não pode ser vazio.")
-
-        val_str = str(value).strip().lower()
-        val_str = re.sub(r"\.0+$", "", val_str)
-
-        return val_str
-
-    #
-    #
     #
     #
     #
@@ -73,13 +39,9 @@ class VinculoDto(BaseModel):
 #
 #
 #
-#
-#
 class VinculoFiltro(BaseModel):
     matricula: str | None = Field(None, description="Filtrar por parte do matricula")
-    modalidade: ModalidadeType | None = Field(
-        None, description="Filtrar por parte do matricula"
-    )
-    polo: PoloType | None = Field(None, description="Filtrar por parte do matricula")
     email: str | None = Field(None, description="Filtrar por parte do email")
     status: bool | None = Field(None, description="Filtrar por status")
+    login: str | None = Field(None, description="Filtrar por parte do login")
+    is_primary: bool | None = Field(None, description="Filtrar por is_primary")
