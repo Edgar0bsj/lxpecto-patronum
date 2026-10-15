@@ -1,7 +1,6 @@
 from src.module.vinculo.vinculo_model import VinculoModel
 from src.module.vinculo.vinculo_storage import VinculoStorage
 from src.module.vinculo.vinculo_dto import VinculoDto, VinculoFiltro
-from src.module.aluno.aluno_storage import AlunoStorage
 
 from nanoid import generate
 
@@ -9,7 +8,6 @@ from nanoid import generate
 class VinculoService:
     def __init__(self):
         self.repo = VinculoStorage()
-        self.aluno_repo = AlunoStorage()
 
     #
     #
@@ -18,6 +16,8 @@ class VinculoService:
     #
     #
     def create_vinculo(self, vinculo_dto: VinculoDto):
+        print(vinculo_dto)
+        input()
         token = generate(size=10)
         id = f"vinc_{vinculo_dto.matricula[-3:]}{token}"
 

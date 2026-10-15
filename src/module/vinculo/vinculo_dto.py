@@ -10,7 +10,7 @@ class VinculoDto(BaseModel):
     status: bool
     login: Annotated[str, Field(min_length=3, max_length=100)]
     senha: Annotated[str, Field(min_length=3, max_length=100)]
-    is_primary: bool = False
+    is_primary: bool = True
 
     # fk
     aluno_id: Annotated[str, Field(min_length=3, max_length=100)]
@@ -45,3 +45,4 @@ class VinculoFiltro(BaseModel):
     status: bool | None = Field(None, description="Filtrar por status")
     login: str | None = Field(None, description="Filtrar por parte do login")
     is_primary: bool | None = Field(None, description="Filtrar por is_primary")
+    aluno_id: str | None = Field(None, description="Filtrar por aluno_id")

@@ -97,6 +97,11 @@ class VinculoStorage:
                     VinculoModel.is_primary == vinculo_filtro.is_primary
                 )
 
+            if vinculo_filtro.aluno_id:
+                statement = statement.where(
+                    VinculoModel.aluno_id.ilike(f"%{vinculo_filtro.aluno_id}%")
+                )
+
             vinculo = session.scalars(statement).all()
 
             return vinculo

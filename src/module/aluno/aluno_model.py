@@ -1,8 +1,8 @@
 from src.database.db_config import Base
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
-from sqlalchemy import DateTime, String, Integer, Boolean
+from sqlalchemy import DateTime, String
 
 
 class AlunoModel(Base):

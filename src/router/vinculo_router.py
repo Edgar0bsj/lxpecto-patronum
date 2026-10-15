@@ -39,7 +39,6 @@ async def create_vinculo(
         )
 
     except Exception as err:
-        raise
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Putz... Error inesperado meu nobre",
@@ -62,7 +61,6 @@ async def update_vinculo(
         return vinculo
 
     except Exception as err:
-        raise
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Putz... Error inesperado meu nobre",
