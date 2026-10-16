@@ -168,6 +168,7 @@ async def importar_excel_aluno(
         )
 
     except ValueError as err:
+        raise
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(err),

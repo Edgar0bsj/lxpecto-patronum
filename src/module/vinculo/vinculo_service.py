@@ -23,6 +23,16 @@ class VinculoService:
         token = generate(size=10)
         id = f"vinc_{vinculo_dto.matricula[-3:]}{token}"
 
+        vinculos = self.find_all(
+            VinculoFiltro(aluno_id=vinculo_dto.aluno_id, is_primary=True)
+        )
+
+        print(vinculos)
+        print(len(vinculos))
+        input()
+        if len(vinculos) != 0:
+            vinculo_dto.is_primary = False
+
         aluno = self.repo.create(id, vinculo_dto)
 
         return aluno
@@ -92,7 +102,10 @@ class VinculoService:
             status = vinc[col_status]
             login = vinc[col_login]
             senha = vinc[col_senha]
-            is_primary = vinc[col_is_primary]
+
+            is_primary = True
+            if "is_primary" in vinc:
+                is_primary = vinc[col_is_primary]
 
             try:
                 _buffer_vinculo.append(
@@ -162,12 +175,12 @@ class VinculoService:
             )
             return
 
-        aluno = service_aluno.find_by_cpf(cpf_aluno)
+        aluno = service_aluno.find_by_cpf(cpf_limpo)
 
         if not aluno:
             buffer_err.append(
                 {
-                    "cpf_aluno": cpf_aluno,
+                    "cpf_aluno": cpf_limpo,
                     "matricula": vinc_dto.matricula,
                     "email": vinc_dto.email,
                     "status": vinc_dto.status,
@@ -199,9 +212,6 @@ class VinculoService:
             VinculoFiltro(aluno_id=vinculo_dto.aluno_id, is_primary=True)
         )
 
-        if len(vinculos) < 2:
-            return True
-
         if is_primary and len(vinculos) != 0:
 
             for vinc in vinculos:
@@ -215,6 +225,5 @@ class VinculoService:
                     aluno_id=vinc.aluno_id,
                 )
                 self.update_vinculo(vinc.id, vinc_dto)
-            return True
 
-        return False
+        return True

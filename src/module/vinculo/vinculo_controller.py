@@ -20,10 +20,6 @@ class VinculoController:
         if not aluno:
             raise ValueError("Aluno não existe na base de dados")
 
-        vinculo_dto.is_primary = self.service.garantir_vinculo_primario_unico(
-            vinculo_dto=vinculo_dto, is_primary=True
-        )
-
         result = self.service.create_vinculo(vinculo_dto)
 
         return result.__dict__
@@ -82,7 +78,6 @@ class VinculoController:
                 "status": "",
                 "login": "",
                 "senha": "",
-                "is_primary": "",
             }
         ]
         df = pd.DataFrame(_tamplete)
