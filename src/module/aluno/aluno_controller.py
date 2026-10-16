@@ -64,7 +64,7 @@ class AlunoController:
     async def import_excel_aluno(self, file: UploadFile):
 
         if not file.filename or not file.filename.endswith(".xlsx"):
-            raise ValueError("Apenas arquivos no formato .xlsx são permitidos.")
+            raise ValueError("Apenas arquivos no formato .xlsx são permitidos")
 
         contents = await file.read()
 
@@ -156,5 +156,46 @@ class AlunoController:
 
         def iterfile():
             yield excel_buffer.getvalue()
+
+        return iterfile
+
+    #
+    #
+    #
+    #
+    async def export_lxp_manager(self):
+
+        alunos = self.service.find_all(AlunoFiltro())
+
+        _person_buffer = []
+        for alun in alunos:
+            vinculos = alun.vinculo
+            vinculo_ativo = next((e for e in vinculos if e.is_primary), None)
+
+            if vinculo_ativo is None:
+                continue
+
+            person_xlp = self.service.mapper_lxp_manager(
+                name=alun.nome.title(),
+                identityDocument=alun.cpf,
+                externalId=alun.cpf,
+                email=vinculo_ativo.email,
+                username=vinculo_ativo.login,
+                password=vinculo_ativo.senha,
+                tags='["UNIG"]',
+                isActive=vinculo_ativo.status,
+            )
+
+            _person_buffer.append(person_xlp)
+
+        df = pd.DataFrame(_person_buffer)
+
+        csv_buffer = io.BytesIO()
+        df.to_csv(csv_buffer, index=False, sep=";", encoding="utf-8")
+
+        csv_buffer.seek(0)
+
+        def iterfile():
+            yield csv_buffer.getvalue()
 
         return iterfile

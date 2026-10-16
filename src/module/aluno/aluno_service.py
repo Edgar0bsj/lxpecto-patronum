@@ -101,3 +101,40 @@ class AlunoService:
                 continue
 
         return (_buffer_alunos, _buffer_alunos_err)
+
+    #
+    #
+    #
+    #
+    #
+    def mapper_lxp_manager(
+        self,
+        name: str,
+        identityDocument: str,
+        externalId: str,
+        email: str,
+        username: str,
+        password: str,
+        tags: str,
+        isActive: bool,
+    ):
+        return {
+            "name": name,
+            "socialName": "",
+            "identityDocument": identityDocument,
+            "identityDocumentTypeId": "CPF",
+            "passportNumber": "",
+            "externalId": externalId,
+            "address.zipCode": "",
+            "address.state": "",
+            "address.city": "",
+            "address.address": "",
+            "address.number": "",
+            "address.neighborhood": "",
+            "address.complement": "",
+            "user.email": email,
+            "user.username": username,
+            "user.password": password,
+            "tags": tags,
+            "isActive": isActive,
+        }
