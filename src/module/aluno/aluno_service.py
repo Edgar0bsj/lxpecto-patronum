@@ -118,6 +118,11 @@ class AlunoService:
         tags: str,
         isActive: bool,
     ):
+
+        tag_parts = [item.strip() for item in tags.split(",") if item.strip()]
+        tag_fmt = [f'["{item.upper()}"]' for item in tag_parts]
+        tags_result = ",".join(tag_fmt)
+
         return {
             "name": name,
             "socialName": "",
@@ -135,6 +140,6 @@ class AlunoService:
             "user.email": email,
             "user.username": username,
             "user.password": password,
-            "tags": tags,
+            "tags": tags_result,
             "isActive": isActive,
         }

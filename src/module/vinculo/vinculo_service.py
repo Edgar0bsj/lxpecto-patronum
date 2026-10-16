@@ -27,9 +27,6 @@ class VinculoService:
             VinculoFiltro(aluno_id=vinculo_dto.aluno_id, is_primary=True)
         )
 
-        print(vinculos)
-        print(len(vinculos))
-        input()
         if len(vinculos) != 0:
             vinculo_dto.is_primary = False
 
@@ -90,6 +87,7 @@ class VinculoService:
         col_login="login",
         col_senha="senha",
         col_is_primary="is_primary",
+        col_tags="tags",
     ) -> tuple[list[tuple[str, VinculoDto]], list[dict]]:
 
         _buffer_vinculo: list[tuple] = []
@@ -102,6 +100,7 @@ class VinculoService:
             status = vinc[col_status]
             login = vinc[col_login]
             senha = vinc[col_senha]
+            tags = vinc[col_tags]
 
             is_primary = True
             if "is_primary" in vinc:
@@ -119,6 +118,7 @@ class VinculoService:
                             senha=senha,
                             is_primary=is_primary,
                             aluno_id=None,
+                            tags=tags,
                         ),
                     )
                 )
@@ -133,6 +133,7 @@ class VinculoService:
                         "login": login,
                         "senha": senha,
                         "is_primary": is_primary,
+                        "tags": tags,
                         "detalhes": "Error de validação",
                     }
                 )
@@ -170,6 +171,7 @@ class VinculoService:
                     "login": vinc_dto.login,
                     "senha": vinc_dto.senha,
                     "is_primary": vinc_dto.is_primary,
+                    "tags": vinc_dto.tags,
                     "detalhes": "O CPF deve conter exatamente 11 dígitos",
                 }
             )
@@ -187,6 +189,7 @@ class VinculoService:
                     "login": vinc_dto.login,
                     "senha": vinc_dto.senha,
                     "is_primary": vinc_dto.is_primary,
+                    "tags": vinc_dto.tags,
                     "detalhes": "cpf não existe na base de dados",
                 }
             )
@@ -223,6 +226,7 @@ class VinculoService:
                     senha=vinc.senha,
                     is_primary=False,
                     aluno_id=vinc.aluno_id,
+                    tags=vinc.tags,
                 )
                 self.update_vinculo(vinc.id, vinc_dto)
 

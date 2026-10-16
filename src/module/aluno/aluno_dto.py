@@ -48,6 +48,9 @@ class AlunoRequest(BaseModel):
         if len(cpf_limpo) != 11:
             raise ValueError("O CPF deve conter exatamente 11 dígitos.")
 
+        if re.match(r"^(\d)\1{10}$", cpf_limpo):
+            raise ValueError("CPF inválido")
+
         return cpf_limpo
 
 

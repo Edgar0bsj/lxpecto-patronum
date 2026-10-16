@@ -78,6 +78,7 @@ class VinculoController:
                 "status": "",
                 "login": "",
                 "senha": "",
+                "tags": "",
             }
         ]
         df = pd.DataFrame(_tamplete)
@@ -142,6 +143,7 @@ class VinculoController:
                         "login": add_vinc.login,
                         "senha": add_vinc.senha,
                         "is_primary": add_vinc.is_primary,
+                        "tags": add_vinc.tags,
                         "detalhes": str(err.detail),
                     }
                 )
@@ -159,6 +161,7 @@ class VinculoController:
                         "login": upd_vinc.login,
                         "senha": upd_vinc.senha,
                         "is_primary": upd_vinc.is_primary,
+                        "tags": upd_vinc.tags,
                         "detalhes": str(err.detail),
                     }
                 )

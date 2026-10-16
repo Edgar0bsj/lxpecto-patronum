@@ -28,6 +28,7 @@ class VinculoStorage:
                 senha=vinculo_dto.senha,
                 is_primary=vinculo_dto.is_primary,
                 aluno_id=vinculo_dto.aluno_id,
+                tags=vinculo_dto.tags,
             )
 
             session.add(vinculo)
@@ -57,6 +58,7 @@ class VinculoStorage:
             vinculo.senha = vinculo_dto.senha
             vinculo.is_primary = vinculo_dto.is_primary
             vinculo.aluno_id = vinculo_dto.aluno_id
+            vinculo.tags = vinculo_dto.tags
 
             session.commit()
             session.refresh(vinculo)
@@ -100,6 +102,11 @@ class VinculoStorage:
             if vinculo_filtro.aluno_id:
                 statement = statement.where(
                     VinculoModel.aluno_id.ilike(f"%{vinculo_filtro.aluno_id}%")
+                )
+
+            if vinculo_filtro.tags:
+                statement = statement.where(
+                    VinculoModel.tags.ilike(f"%{vinculo_filtro.tags}%")
                 )
 
             vinculo = session.scalars(statement).all()

@@ -185,11 +185,13 @@ async def export_lxp_manager(
         )
 
     except ValueError as err:
+        raise
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(err),
         )
     except Exception as err:
+        raise
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Putz... Error inesperado meu nobre",

@@ -175,6 +175,7 @@ class AlunoController:
             if vinculo_ativo is None:
                 continue
 
+            tags = vinculo_ativo.tags
             person_xlp = self.service.mapper_lxp_manager(
                 name=alun.nome.title(),
                 identityDocument=alun.cpf,
@@ -182,7 +183,7 @@ class AlunoController:
                 email=vinculo_ativo.email,
                 username=vinculo_ativo.login,
                 password=vinculo_ativo.senha,
-                tags='["UNIG"]',
+                tags=tags,
                 isActive=vinculo_ativo.status,
             )
 

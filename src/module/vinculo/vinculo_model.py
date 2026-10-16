@@ -21,6 +21,8 @@ class VinculoModel(Base):
     senha: Mapped[str] = mapped_column(String(100), nullable=False)
 
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    tags: Mapped[str] = mapped_column(String(225))
     #
     #
     # Relacionamento

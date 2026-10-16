@@ -11,6 +11,7 @@ class VinculoDto(BaseModel):
     login: Annotated[str, Field(min_length=3, max_length=100)]
     senha: Annotated[str, Field(min_length=3, max_length=100)]
     is_primary: bool = True
+    tags: str | None = None
 
     # fk
     aluno_id: str | None
@@ -81,6 +82,21 @@ class VinculoDto(BaseModel):
 
         return val_str
 
+    #
+    #
+    #
+    @field_validator("tags", mode="before")
+    @classmethod
+    def normalizar_tags(cls, value: Any) -> str:
+        if not value:
+            return ""
+
+        texto_bruto = str(value).strip()
+        partes = [item.strip() for item in texto_bruto.split(",") if item.strip()]
+
+        val_str = ", ".join(partes)
+        return val_str
+
 
 #
 #
@@ -92,3 +108,4 @@ class VinculoFiltro(BaseModel):
     login: str | None = Field(None, description="Filtrar por parte do login")
     is_primary: bool | None = Field(None, description="Filtrar por is_primary")
     aluno_id: str | None = Field(None, description="Filtrar por aluno_id")
+    tags: str | None = Field(None, description="Filtrar por tags")
