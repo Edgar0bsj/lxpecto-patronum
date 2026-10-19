@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from src.module.aluno.aluno_controller import AlunoController
-from src.module.aluno.aluno_dto import AlunoRequest
+from src.module.aluno.aluno_dto import AlunoRequest, AlunoCreate
+
+from src.module.aluno.aluno_dto import AlunoCreate, AlunoUpdate
 
 from sqlalchemy.exc import IntegrityError
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -17,46 +19,34 @@ def get_controller():
 #
 #
 #
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_aluno(
-    req: AlunoRequest, controller: AlunoController = Depends(get_controller)
+@router.post("/")
+async def aluno_created(
+    req: AlunoCreate, controller: AlunoController = Depends(get_controller)
 ):
-    try:
-        aluno = controller.create_aluno(req)
 
-        return aluno
+    controller.aluno_created(req)
 
-    except IntegrityError as err:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Registro duplicado ou violação de integridade no banco de dados.",
-        )
-
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
+    return JSONResponse(
+        content={"success": True, "detail": "Salvo com sucesso!"},
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 #
 #
 #
 #
-@router.put("/{id}", status_code=status.HTTP_200_OK)
-async def update_aluno(
-    id: str, req: AlunoRequest, controller: AlunoController = Depends(get_controller)
+@router.patch("/{id}")
+async def aluno_updated(
+    id: str, req: AlunoUpdate, controller: AlunoController = Depends(get_controller)
 ):
-    try:
-        aluno = controller.update_aluno(id, req)
 
-        return aluno
+    controller.aluno_updated(id, req)
 
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
+    return JSONResponse(
+        content={"success": True, "detail": "Aluno Atualizado com sucesso!"},
+        status_code=status.HTTP_200_OK,
+    )
 
 
 #
@@ -64,20 +54,16 @@ async def update_aluno(
 #
 #
 @router.get("/", status_code=status.HTTP_200_OK)
-async def find_all_aluno(
+async def aluno_get_all(
     aluno_filtro: AlunoFiltro = Depends(),
     controller: AlunoController = Depends(get_controller),
 ):
-    try:
-        alunos = controller.find_all_aluno(aluno_filtro)
+    alunos = controller.aluno_get_all(aluno_filtro)
 
-        return alunos
-
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
+    return JSONResponse(
+        content=alunos,
+        status_code=status.HTTP_200_OK,
+    )
 
 
 #

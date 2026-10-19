@@ -35,17 +35,13 @@ class AlunoStorage:
     #
     #
     #
-    def update(self, id: str, aluno_dto: AlunoRequest) -> "AlunoModel":
+    def update(self, id: str, aluno_model: AlunoModel) -> None:
 
         with SessionLocal() as session:
-
             aluno = session.get(AlunoModel, id)
 
-            if not aluno:
-                return None
-
-            aluno.nome = aluno_dto.nome
-            aluno.cpf = aluno_dto.cpf
+            aluno.nome = aluno_model.nome
+            aluno.cpf = aluno_model.cpf
 
             session.commit()
             session.refresh(aluno)
@@ -129,3 +125,17 @@ class AlunoStorage:
             aluno = session.scalars(statement).first()
 
             return aluno
+
+    # ==============================================
+    # REFATORAÇÃO
+    # ==============================================
+    def save(self, aluno_model: AlunoModel) -> None:
+
+        with SessionLocal() as session:
+
+            session.add(aluno_model)
+            session.commit()
+
+            session.refresh(aluno_model)
+
+            return aluno_model

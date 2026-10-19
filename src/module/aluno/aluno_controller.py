@@ -1,7 +1,14 @@
+from dataclasses import asdict
 import io
+
+from src.module.err.exceptions import ConflitoException, NotFoundException
+
+from src.module.aluno.aluno_model import AlunoModel
+from src.module.aluno.aluno_storage import AlunoStorage
 
 from src.module.aluno.aluno_service import AlunoService
 from src.module.aluno.aluno_dto import AlunoRequest, AlunoFiltro
+from src.module.aluno.aluno_dto import AlunoCreate, AlunoUpdate
 
 from fastapi import UploadFile
 from sqlalchemy.exc import IntegrityError
@@ -11,34 +18,63 @@ import pandas as pd
 class AlunoController:
     def __init__(self):
         self.service = AlunoService()
+        self.repo = AlunoStorage()
 
-    def create_aluno(self, aluno_dto: AlunoRequest):
-        result = self.service.create_aluno(aluno_dto)
+    def aluno_created(self, aluno_created: AlunoCreate) -> None:
 
-        return result.__dict__
+        isExist = self.service.isExist_cpf(aluno_created.cpf)
+
+        if isExist:
+            raise ConflitoException("CPF já existe !")
+
+        id = self.service.gerar_id()
+
+        aluno = AlunoModel(id=id, nome=aluno_created.nome, cpf=aluno_created.cpf)
+
+        self.repo.save(aluno)
+
+        return None
 
     #
     #
     #
     #
     #
-    def update_aluno(self, id: str, aluno_dto: AlunoRequest):
-        result = self.service.update_aluno(id, aluno_dto)
-        return result.__dict__
+    def aluno_updated(self, id: str, aluno_updated: AlunoUpdate) -> None:
+        aluno = self.repo.find_by_id(id)
+
+        if not aluno:
+            raise NotFoundException("Id não encontrado!")
+
+        if aluno_updated.cpf and aluno_updated.cpf != aluno.cpf:
+            isExist_cpf = self.service.isExist_cpf(aluno_updated.cpf)
+
+            if isExist_cpf:
+                raise ConflitoException("CPF já cadastrado !")
+
+        if aluno_updated.nome:
+            aluno.nome = aluno_updated.nome
+        if aluno_updated.cpf:
+            aluno.cpf = aluno_updated.cpf
+
+        self.repo.update(id, aluno)
 
     #
     #
     #
     #
     #
-    def find_all_aluno(self, aluno_filtro: AlunoFiltro):
-        result = self.service.find_all(aluno_filtro)
+    def aluno_get_all(self, aluno_filtro: AlunoFiltro):
+        alunos = self.repo.find_all(aluno_filtro)
 
-        if len(result) == 0:
+        if len(alunos) == 0:
             return []
 
-        alunos = [el.__dict__ for el in result]
-        return alunos
+        result = self.service.model_to_response(alunos)
+
+        res = [asdict(el) for el in result]
+
+        return res
 
     #
     #
@@ -95,7 +131,7 @@ class AlunoController:
 
         for add_aluno in alunos_notExist:
             try:
-                self.create_aluno(add_aluno)
+                self.aluno_created(add_aluno)
             except IntegrityError as err:
                 alunos_err.append(
                     {
@@ -108,7 +144,7 @@ class AlunoController:
 
         for update_aluno in alunos_exist:
             try:
-                self.update_aluno(update_aluno["id"], update_aluno["aluno"])
+                self.aluno_updated(update_aluno["id"], update_aluno["aluno"])
             except IntegrityError as err:
                 alunos_err.append(
                     {
