@@ -107,11 +107,6 @@ class AlunoStorage:
 
             return True
 
-    #
-    #
-    #
-    #
-    #
     def find_by_cpf(self, cpf: str) -> "AlunoModel":
 
         with SessionLocal() as session:

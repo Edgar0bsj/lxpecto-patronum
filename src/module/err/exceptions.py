@@ -17,14 +17,14 @@ class NotFoundException(Exception):
 def register_exception_handlers(app):
 
     @app.exception_handler(ConflitoException)
-    async def app_error_handler(request: Request, exc: ConflitoException):
+    async def conflito_exception_handler(request: Request, exc: ConflitoException):
         return JSONResponse(
             status_code=exc.status_code,
             content={"success": False, "detail": exc.detail},
         )
 
     @app.exception_handler(NotFoundException)
-    async def app_error_handler(request: Request, exc: NotFoundException):
+    async def not_found_exception_handler(request: Request, exc: NotFoundException):
         return JSONResponse(
             status_code=exc.status_code,
             content={"success": False, "detail": exc.detail},

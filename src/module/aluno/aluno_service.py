@@ -1,8 +1,19 @@
+import io
+
+import pandas as pd
+from nanoid import generate
+from pydantic import ValidationError
+
+from src.module.aluno.aluno_dto import (
+    AlunoFiltro,
+    AlunoImportError,
+    AlunoImportXlsx,
+    AlunoRequest,
+    AlunoResponse,
+    VinculoResponse,
+)
 from src.module.aluno.aluno_model import AlunoModel
 from src.module.aluno.aluno_storage import AlunoStorage
-from src.module.aluno.aluno_dto import AlunoFiltro, AlunoRequest
-from src.module.aluno.aluno_dto import AlunoResponse, VinculoResponse
-from nanoid import generate
 
 
 class AlunoService:
@@ -16,12 +27,6 @@ class AlunoService:
 
         return id
 
-    #
-    #
-    #
-    #
-    #
-    #
     def save(self, aluno_dto: AlunoRequest):
         token = generate(size=10)
         id = f"aluno_{aluno_dto.cpf[-3:]}{token}"
@@ -30,57 +35,21 @@ class AlunoService:
 
         return aluno
 
-    #
-    #
-    #
-    #
-    #
-    #
     def update_aluno(self, id: str, aluno_dto: AlunoRequest):
         return self.repo.update(id=id, aluno_model=aluno_dto)
 
-    #
-    #
-    #
-    #
-    #
-    #
     def find_all(self, aluno_filtro: AlunoFiltro) -> list[AlunoModel]:
         return self.repo.find_all(aluno_filtro)
 
-    #
-    #
-    #
-    #
-    #
-    #
     def delete(self, id: str) -> bool:
         return self.repo.delete(id)
 
-    #
-    #
-    #
-    #
-    #
-    #
     def find_by_id(self, id: str) -> AlunoModel:
         return self.repo.find_by_id(id)
 
-    #
-    #
-    #
-    #
-    #
-    #
     def find_by_cpf(self, cpf: str) -> AlunoModel:
         return self.repo.find_by_cpf(cpf)
 
-    #
-    #
-    #
-    #
-    #
-    #
     def parse_and_validate_rows(
         self,
         aluno_row: list[dict],
@@ -110,11 +79,6 @@ class AlunoService:
 
         return (_buffer_alunos, _buffer_alunos_err)
 
-    #
-    #
-    #
-    #
-    #
     def mapper_lxp_manager(
         self,
         name: str,
@@ -155,17 +119,11 @@ class AlunoService:
     # ===============================================
     # REFATORAÇÃO
     # ===============================================
-    def isExist_cpf(self, cpf: str) -> bool:
+    def get_cpf(self, cpf: str) -> AlunoModel | None:
         result = self.repo.find_by_cpf(cpf)
 
-        if not result:
-            return False
+        return result
 
-        return True
-
-    #
-    #
-    #
     def model_to_response(
         self, aluno_model: list[AlunoModel] | AlunoModel
     ) -> list[AlunoResponse] | AlunoResponse:
@@ -204,9 +162,6 @@ class AlunoService:
                 _buffer.append(_alun)
 
             return _buffer
-        #
-        #
-        #
 
         _alun = AlunoResponse(
             id=aluno_model.id,
@@ -236,3 +191,31 @@ class AlunoService:
             _alun.vinculo.append(_vinculo)
 
         return _alun
+
+    def convert_to_import_DTO(
+        self, contents: bytes, collum=["nome", "cpf"]  # noqa: B006
+    ) -> tuple[list["AlunoImportXlsx"], list["AlunoImportError"]]:
+
+        df = pd.read_excel(io.BytesIO(contents))
+
+        df.fillna("")
+
+        alunos_dict = df.to_dict(orient="records")
+
+        _buffer_alunos = []
+        _buffer_erros = []
+
+        for aluno in alunos_dict:
+            _nome = aluno[collum[0]]
+            _cpf = aluno[collum[1]]
+
+            try:
+                _element = AlunoImportXlsx(nome=_nome, cpf=_cpf)
+                _buffer_alunos.append(_element)
+
+            except ValidationError as err:
+                _buffer_erros.append(
+                    AlunoImportError(nome=_nome, cpf=_cpf, detail=str(err))
+                )
+
+        return (_buffer_alunos, _buffer_erros)

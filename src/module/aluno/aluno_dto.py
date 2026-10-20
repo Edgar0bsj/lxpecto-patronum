@@ -1,8 +1,6 @@
-from dataclasses import dataclass
 import re
-from typing import Annotated, Any, Optional
-
-from datetime import datetime
+from dataclasses import asdict, dataclass
+from typing import Annotated, Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -15,9 +13,6 @@ class AlunoRequest(BaseModel):
     nome: NomeType
     cpf: CpfType
 
-    #
-    #
-    #
     @field_validator("nome", mode="before")
     @classmethod
     def normalizar_nome(cls, value: Any) -> str:
@@ -29,9 +24,6 @@ class AlunoRequest(BaseModel):
 
         return val_str
 
-    #
-    #
-    #
     @field_validator("cpf", mode="before")
     @classmethod
     def normalizar_cpf(cls, value: Any) -> str:
@@ -64,9 +56,6 @@ class AlunoCreate(BaseModel):
     nome: Annotated[str, Field(min_length=3, max_length=150)]
     cpf: Annotated[str, Field(min_length=11, max_length=11)]
 
-    #
-    #
-    #
     @field_validator("nome", mode="before")
     @classmethod
     def normalizar_nome(cls, value: Any) -> str:
@@ -78,9 +67,6 @@ class AlunoCreate(BaseModel):
 
         return val_str
 
-    #
-    #
-    #
     @field_validator("cpf", mode="before")
     @classmethod
     def normalizar_cpf(cls, value: Any) -> str:
@@ -110,12 +96,9 @@ class AlunoCreate(BaseModel):
 # AlunoUpdate
 # ===================================================
 class AlunoUpdate(BaseModel):
-    nome: Optional[NomeType] = None
-    cpf: Optional[NomeType] = None
+    nome: NomeType | None = None
+    cpf: NomeType | None = None
 
-    #
-    #
-    #
     @field_validator("nome", mode="before")
     @classmethod
     def normalizar_nome(cls, value: Any) -> str:
@@ -188,3 +171,23 @@ class AlunoResponse:
     vinculo: list[VinculoResponse]
     created_at: str
     updated_at: str
+
+
+# ===================================================
+# AlunoImportXlsx
+# ===================================================
+class AlunoImportXlsx(AlunoCreate):
+    isExist: bool | None = None
+
+
+# ===================================================
+# AlunoImportXlsxError
+# ===================================================
+@dataclass
+class AlunoImportError:
+    nome: str
+    cpf: str
+    detail: str
+
+    def to_dict(self) -> dict:
+        return asdict(self)

@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from src.module.aluno.aluno_controller import AlunoController
-from src.module.aluno.aluno_dto import AlunoRequest, AlunoCreate
-
-from src.module.aluno.aluno_dto import AlunoCreate, AlunoUpdate
-
-from sqlalchemy.exc import IntegrityError
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse, StreamingResponse
-from src.module.aluno.aluno_dto import AlunoFiltro
+
+from src.module.aluno.aluno_controller import AlunoController
+from src.module.aluno.aluno_dto import (
+    AlunoCreate,
+    AlunoFiltro,
+    AlunoUpdate,
+)
 
 router = APIRouter(prefix="/aluno", tags=["Aluno"])
 
@@ -15,10 +15,6 @@ def get_controller():
     return AlunoController()
 
 
-#
-#
-#
-#
 @router.post("/")
 async def aluno_created(
     req: AlunoCreate, controller: AlunoController = Depends(get_controller)
@@ -70,24 +66,15 @@ async def aluno_get_all(
 #
 #
 #
-@router.delete("/{id}", status_code=status.HTTP_200_OK)
-async def delete_aluno(id: str, controller: AlunoController = Depends(get_controller)):
-    try:
-        alunos = controller.delete_aluno(id)
+@router.delete("/{id}")
+async def aluno_delete(id: str, controller: AlunoController = Depends(get_controller)):
 
-        if not alunos:
-            return JSONResponse(
-                content={"msg": "Aluno não encontrado"},
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
+    controller.aluno_delete(id)
 
-        return {"msg": "Aluno deletado com sucesso!"}
-
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
+    return JSONResponse(
+        content=None,
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
 
 
 #
@@ -95,30 +82,17 @@ async def delete_aluno(id: str, controller: AlunoController = Depends(get_contro
 #
 #
 @router.post("/importar-excel/", status_code=status.HTTP_200_OK)
-async def importar_excel_aluno(
+async def aluno_import_xlsx(
     file: UploadFile = File(...), controller: AlunoController = Depends(get_controller)
 ):
 
-    try:
+    iterfile = await controller.aluno_import_xlsx(file)
 
-        iterfile = await controller.import_excel_aluno(file)
-
-        return StreamingResponse(
-            iterfile(),
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": "attachment; filename=aluno_errs.xlsx"},
-        )
-
-    except ValueError as err:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(err),
-        )
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
+    return StreamingResponse(
+        iterfile(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=aluno_errs.xlsx"},
+    )
 
 
 #

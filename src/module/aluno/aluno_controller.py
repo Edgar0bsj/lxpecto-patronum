@@ -1,18 +1,20 @@
-from dataclasses import asdict
 import io
+from dataclasses import asdict
 
-from src.module.err.exceptions import ConflitoException, NotFoundException
-
-from src.module.aluno.aluno_model import AlunoModel
-from src.module.aluno.aluno_storage import AlunoStorage
-
-from src.module.aluno.aluno_service import AlunoService
-from src.module.aluno.aluno_dto import AlunoRequest, AlunoFiltro
-from src.module.aluno.aluno_dto import AlunoCreate, AlunoUpdate
-
-from fastapi import UploadFile
-from sqlalchemy.exc import IntegrityError
 import pandas as pd
+from fastapi import UploadFile
+from pydantic import ValidationError
+
+from src.module.aluno.aluno_dto import (
+    AlunoCreate,
+    AlunoFiltro,
+    AlunoImportError,
+    AlunoUpdate,
+)
+from src.module.aluno.aluno_model import AlunoModel
+from src.module.aluno.aluno_service import AlunoService
+from src.module.aluno.aluno_storage import AlunoStorage
+from src.module.err.exceptions import ConflitoException, NotFoundException
 
 
 class AlunoController:
@@ -20,9 +22,12 @@ class AlunoController:
         self.service = AlunoService()
         self.repo = AlunoStorage()
 
+    # ================================================================
+    # ALUNO CREATED
+    # ================================================================
     def aluno_created(self, aluno_created: AlunoCreate) -> None:
 
-        isExist = self.service.isExist_cpf(aluno_created.cpf)
+        isExist = self.service.get_cpf(aluno_created.cpf)
 
         if isExist:
             raise ConflitoException("CPF já existe !")
@@ -33,13 +38,9 @@ class AlunoController:
 
         self.repo.save(aluno)
 
-        return None
-
-    #
-    #
-    #
-    #
-    #
+    # ================================================================
+    # ALUNO UPDATED
+    # ================================================================
     def aluno_updated(self, id: str, aluno_updated: AlunoUpdate) -> None:
         aluno = self.repo.find_by_id(id)
 
@@ -47,7 +48,7 @@ class AlunoController:
             raise NotFoundException("Id não encontrado!")
 
         if aluno_updated.cpf and aluno_updated.cpf != aluno.cpf:
-            isExist_cpf = self.service.isExist_cpf(aluno_updated.cpf)
+            isExist_cpf = self.service.get_cpf(aluno_updated.cpf)
 
             if isExist_cpf:
                 raise ConflitoException("CPF já cadastrado !")
@@ -59,11 +60,9 @@ class AlunoController:
 
         self.repo.update(id, aluno)
 
-    #
-    #
-    #
-    #
-    #
+    # ================================================================
+    # ALUNO GET ALL
+    # ================================================================
     def aluno_get_all(self, aluno_filtro: AlunoFiltro):
         alunos = self.repo.find_all(aluno_filtro)
 
@@ -76,88 +75,72 @@ class AlunoController:
 
         return res
 
-    #
-    #
-    #
-    #
-    #
-    def delete_aluno(self, id: str):
-        return self.service.delete(id)
+    # ================================================================
+    # ALUNO DELETE
+    # ================================================================
+    def aluno_delete(self, id: str) -> None:
+        result = self.repo.delete(id)
 
-    #
-    #
-    #
-    #
-    #
+        if not result:
+            raise NotFoundException("Id não encontrado !")
+
+    # ================================================================
+    # ALUNO FIND BY NOME
+    # ================================================================
     def find_by_nome(self, nome: str):
         return self.service.find_by_nome(nome)
 
-    #
-    #
-    #
-    #
-    #
-    async def import_excel_aluno(self, file: UploadFile):
+    # ================================================================
+    # ALUNO IMPORT XLSX
+    # ================================================================
+    async def aluno_import_xlsx(self, file: UploadFile):
 
         if not file.filename or not file.filename.endswith(".xlsx"):
             raise ValueError("Apenas arquivos no formato .xlsx são permitidos")
 
         contents = await file.read()
 
-        df = pd.read_excel(io.BytesIO(contents))
+        alunos_impot_dto, alunos_impot_errs = self.service.convert_to_import_DTO(
+            contents=contents
+        )
 
-        df = df.fillna("")
+        for elun in alunos_impot_dto:
+            cpf_exist = self.service.get_cpf(elun.cpf)
+            cpf_exist.isExist = True if cpf_exist is not None else False  # noqa: SIM210
 
-        dados_alunos = df.to_dict(orient="records")
+        alunos_created = [el for el in alunos_impot_dto if not el.isExist]
+        alunos_updated = [el for el in alunos_impot_dto if el.isExist]
 
-        alunos, alunos_err = self.service.parse_and_validate_rows(dados_alunos)
+        print(len(alunos_created))
+        print(len(alunos_updated))
 
-        # ===
-
-        alunos_exist: list = []
-        alunos_notExist: list[AlunoRequest] = []
-
-        for elem in alunos:
-            isExist = self.service.find_by_cpf(elem.cpf)
-
-            if not isExist:
-                alunos_notExist.append(elem)
-                continue
-
-            alunos_exist.append({"id": isExist.id, "aluno": elem})
-            continue
-
-        # ====
-
-        for add_aluno in alunos_notExist:
+        for add in alunos_created:
             try:
-                self.aluno_created(add_aluno)
-            except IntegrityError as err:
-                alunos_err.append(
-                    {
-                        "nome": add_aluno.nome,
-                        "cpf": add_aluno.cpf,
-                        "detalhes": str(err.orig),
-                    }
+                # print(f"Aluno: {add.nome} | Create")
+                self.aluno_created(AlunoCreate(nome=add.nome, cpf=add.cpf))
+            except ValidationError as err:
+                alunos_impot_errs.append(
+                    AlunoImportError(nome=add.nome, cpf=add.cpf, detail=str(err))
                 )
-                continue
+            except ConflitoException as err:
+                alunos_impot_errs.append(
+                    AlunoImportError(nome=add.nome, cpf=add.cpf, detail=err.detail)
+                )
 
-        for update_aluno in alunos_exist:
+        for updat in alunos_updated:
             try:
-                self.aluno_updated(update_aluno["id"], update_aluno["aluno"])
-            except IntegrityError as err:
-                alunos_err.append(
-                    {
-                        "nome": update_aluno["aluno"].nome,
-                        "cpf": update_aluno["aluno"].cpf,
-                        "detalhes": str(err.orig),
-                    }
+                self.aluno_updated(AlunoUpdate(nome=updat.nome, cpf=updat.cpf))
+            except ValidationError as err:
+                # print(f"Aluno: {updat.nome} | Update")
+                alunos_impot_errs.append(
+                    AlunoImportError(nome=updat.nome, cpf=updat.cpf, detail=str(err))
                 )
-                continue
+            except ConflitoException as err:
+                alunos_impot_errs.append(
+                    AlunoImportError(nome=updat.nome, cpf=updat.cpf, detail=err.detail)
+                )
 
-        # ======
-
-        _temp_df = pd.DataFrame(alunos_err)
+        _temp_df = pd.DataFrame(alunos_impot_errs)
         excel_buffer = io.BytesIO()
 
         with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
@@ -170,11 +153,9 @@ class AlunoController:
 
         return iterfile
 
-    #
-    #
-    #
-    #
-    #
+    # ================================================================
+    # ALUNO EXCEL TAMPLETE
+    # ================================================================
     async def export_excel_tamplete(self):
         _tamplete = [
             {
@@ -195,10 +176,9 @@ class AlunoController:
 
         return iterfile
 
-    #
-    #
-    #
-    #
+    # ================================================================
+    # ALUNO LXP MANAGER
+    # ================================================================
     async def export_lxp_manager(self):
 
         alunos = self.service.find_all(AlunoFiltro())
