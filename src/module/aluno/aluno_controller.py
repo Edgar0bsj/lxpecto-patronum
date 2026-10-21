@@ -27,7 +27,7 @@ class AlunoController:
     # ================================================================
     def aluno_created(self, aluno_created: AlunoCreate) -> None:
 
-        isExist = self.service.get_cpf(aluno_created.cpf)
+        isExist = self.repo.find_by_cpf(aluno_created.cpf)
 
         if isExist:
             raise ConflitoException("CPF já existe !")
@@ -48,10 +48,10 @@ class AlunoController:
             raise NotFoundException("Id não encontrado!")
 
         if aluno_updated.cpf and aluno_updated.cpf != aluno.cpf:
-            isExist_cpf = self.service.get_cpf(aluno_updated.cpf)
+            isExist_cpf = self.repo.find_by_cpf(aluno_updated.cpf)
 
             if isExist_cpf:
-                raise ConflitoException("CPF já cadastrado !")
+                raise ConflitoException("CPF Já Cadastrado !")
 
         if aluno_updated.nome:
             aluno.nome = aluno_updated.nome
@@ -105,22 +105,19 @@ class AlunoController:
         )
 
         for elun in alunos_impot_dto:
-            cpf_exist = self.service.get_cpf(elun.cpf)
-            cpf_exist.isExist = True if cpf_exist is not None else False  # noqa: SIM210
+            cpf_exist = self.repo.find_by_cpf(elun.cpf)
+            elun.isExist = bool(cpf_exist)
+            elun.id = cpf_exist.id if bool(cpf_exist) else None
 
         alunos_created = [el for el in alunos_impot_dto if not el.isExist]
         alunos_updated = [el for el in alunos_impot_dto if el.isExist]
 
-        print(len(alunos_created))
-        print(len(alunos_updated))
-
         for add in alunos_created:
             try:
-                # print(f"Aluno: {add.nome} | Create")
                 self.aluno_created(AlunoCreate(nome=add.nome, cpf=add.cpf))
             except ValidationError as err:
                 alunos_impot_errs.append(
-                    AlunoImportError(nome=add.nome, cpf=add.cpf, detail=str(err))
+                    AlunoImportError(nome=add.nome, cpf=add.cpf, detail=err.errors())
                 )
             except ConflitoException as err:
                 alunos_impot_errs.append(
@@ -129,11 +126,15 @@ class AlunoController:
 
         for updat in alunos_updated:
             try:
-                self.aluno_updated(AlunoUpdate(nome=updat.nome, cpf=updat.cpf))
+                self.aluno_updated(
+                    id=updat.id,
+                    aluno_updated=AlunoUpdate(nome=updat.nome, cpf=updat.cpf),
+                )
             except ValidationError as err:
-                # print(f"Aluno: {updat.nome} | Update")
                 alunos_impot_errs.append(
-                    AlunoImportError(nome=updat.nome, cpf=updat.cpf, detail=str(err))
+                    AlunoImportError(
+                        nome=updat.nome, cpf=updat.cpf, detail=err.errors()
+                    )
                 )
             except ConflitoException as err:
                 alunos_impot_errs.append(
@@ -173,46 +174,5 @@ class AlunoController:
 
         def iterfile():
             yield excel_buffer.getvalue()
-
-        return iterfile
-
-    # ================================================================
-    # ALUNO LXP MANAGER
-    # ================================================================
-    async def export_lxp_manager(self):
-
-        alunos = self.service.find_all(AlunoFiltro())
-
-        _person_buffer = []
-        for alun in alunos:
-            vinculos = alun.vinculo
-            vinculo_ativo = next((e for e in vinculos if e.is_primary), None)
-
-            if vinculo_ativo is None:
-                continue
-
-            tags = vinculo_ativo.tags
-            person_xlp = self.service.mapper_lxp_manager(
-                name=alun.nome.title(),
-                identityDocument=alun.cpf,
-                externalId=alun.cpf,
-                email=vinculo_ativo.email,
-                username=vinculo_ativo.login,
-                password=vinculo_ativo.senha,
-                tags=tags,
-                isActive=vinculo_ativo.status,
-            )
-
-            _person_buffer.append(person_xlp)
-
-        df = pd.DataFrame(_person_buffer)
-
-        csv_buffer = io.BytesIO()
-        df.to_csv(csv_buffer, index=False, sep=";", encoding="utf-8")
-
-        csv_buffer.seek(0)
-
-        def iterfile():
-            yield csv_buffer.getvalue()
 
         return iterfile

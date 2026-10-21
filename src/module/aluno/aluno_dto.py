@@ -8,47 +8,6 @@ NomeType = Annotated[str, Field(min_length=3, max_length=150)]
 CpfType = Annotated[str, Field(min_length=11, max_length=11)]
 
 
-# DEPRECADE
-class AlunoRequest(BaseModel):
-    nome: NomeType
-    cpf: CpfType
-
-    @field_validator("nome", mode="before")
-    @classmethod
-    def normalizar_nome(cls, value: Any) -> str:
-
-        if value is None:
-            raise ValueError("Não deve ser Nulo")
-
-        val_str = str(value).strip().lower()
-
-        return val_str
-
-    @field_validator("cpf", mode="before")
-    @classmethod
-    def normalizar_cpf(cls, value: Any) -> str:
-        if value is None:
-            raise ValueError("O cpf não pode ser vazio.")
-
-        val_str = str(value).strip()
-
-        # Remove casas decimais no final (ex: .0 ou .00 comuns vindas do Excel/Pandas)
-        val_str = re.sub(r"\.0+$", "", val_str)
-
-        # Remove tudo o que não for dígito (pontos, traços, letras, etc.)
-        cpf_limpo = re.sub(r"\D", "", val_str)
-
-        cpf_limpo = cpf_limpo.zfill(11)
-
-        if len(cpf_limpo) != 11:
-            raise ValueError("O CPF deve conter exatamente 11 dígitos.")
-
-        if re.match(r"^(\d)\1{10}$", cpf_limpo):
-            raise ValueError("CPF inválido")
-
-        return cpf_limpo
-
-
 # ===================================================
 # AlunoCreate
 # ===================================================
@@ -110,9 +69,6 @@ class AlunoUpdate(BaseModel):
 
         return val_str
 
-    #
-    #
-    #
     @field_validator("cpf", mode="before")
     @classmethod
     def normalizar_cpf(cls, value: Any) -> str:
@@ -177,6 +133,7 @@ class AlunoResponse:
 # AlunoImportXlsx
 # ===================================================
 class AlunoImportXlsx(AlunoCreate):
+    id: str | None = None
     isExist: bool | None = None
 
 
@@ -187,7 +144,7 @@ class AlunoImportXlsx(AlunoCreate):
 class AlunoImportError:
     nome: str
     cpf: str
-    detail: str
+    detail: str | list
 
     def to_dict(self) -> dict:
         return asdict(self)

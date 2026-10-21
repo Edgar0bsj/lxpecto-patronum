@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from src.module.aluno.aluno_dto import AlunoFiltro, AlunoRequest
+from src.module.aluno.aluno_dto import AlunoFiltro
 from src.database.db_config import create_database, SessionLocal
 from src.module.aluno.aluno_model import AlunoModel
 
@@ -10,31 +10,23 @@ class AlunoStorage:
     def __init__(self):
         create_database()
 
-    #
-    #
-    #
-    #
-    def create(self, id: str, aluno_dto: AlunoRequest) -> "AlunoModel":
+    # =============================================
+    # CREATED
+    # =============================================
+    def save(self, aluno_model: AlunoModel) -> None:
 
         with SessionLocal() as session:
 
-            aluno = AlunoModel(
-                id=id,
-                nome=aluno_dto.nome,
-                cpf=aluno_dto.cpf,
-            )
-
-            session.add(aluno)
+            session.add(aluno_model)
             session.commit()
 
-            session.refresh(aluno)
+            session.refresh(aluno_model)
 
-            return aluno
+            return aluno_model
 
-    #
-    #
-    #
-    #
+    # =============================================
+    # UPDATED
+    # =============================================
     def update(self, id: str, aluno_model: AlunoModel) -> None:
 
         with SessionLocal() as session:
@@ -48,10 +40,9 @@ class AlunoStorage:
 
             return aluno
 
-    #
-    #
-    #
-    #
+    # =============================================
+    # FIND ALL
+    # =============================================
     def find_all(self, aluno_filtro: AlunoFiltro) -> list["AlunoModel"]:
         with SessionLocal() as session:
 
@@ -71,10 +62,9 @@ class AlunoStorage:
 
             return alunos
 
-    #
-    #
-    #
-    #
+    # =============================================
+    # FIND BY ID
+    # =============================================
     def find_by_id(self, id: str) -> "AlunoModel":
 
         with SessionLocal() as session:
@@ -89,10 +79,9 @@ class AlunoStorage:
 
             return aluno
 
-    #
-    #
-    #
-    #
+    # =============================================
+    # DELETED
+    # =============================================
     def delete(self, id: str) -> bool:
 
         with SessionLocal() as session:
@@ -107,6 +96,9 @@ class AlunoStorage:
 
             return True
 
+    # =============================================
+    # FIND BY CPF
+    # =============================================
     def find_by_cpf(self, cpf: str) -> "AlunoModel":
 
         with SessionLocal() as session:
@@ -120,17 +112,3 @@ class AlunoStorage:
             aluno = session.scalars(statement).first()
 
             return aluno
-
-    # ==============================================
-    # REFATORAÇÃO
-    # ==============================================
-    def save(self, aluno_model: AlunoModel) -> None:
-
-        with SessionLocal() as session:
-
-            session.add(aluno_model)
-            session.commit()
-
-            session.refresh(aluno_model)
-
-            return aluno_model

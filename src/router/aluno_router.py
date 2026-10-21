@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, UploadFile, status
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from src.module.aluno.aluno_controller import AlunoController
@@ -11,10 +11,16 @@ from src.module.aluno.aluno_dto import (
 router = APIRouter(prefix="/aluno", tags=["Aluno"])
 
 
+# ===============================================
+# Dependencia - Controller
+# ===============================================
 def get_controller():
     return AlunoController()
 
 
+# ===============================================
+# Created Aluno
+# ===============================================
 @router.post("/")
 async def aluno_created(
     req: AlunoCreate, controller: AlunoController = Depends(get_controller)
@@ -28,10 +34,9 @@ async def aluno_created(
     )
 
 
-#
-#
-#
-#
+# ===============================================
+# Updated Aluno
+# ===============================================
 @router.patch("/{id}")
 async def aluno_updated(
     id: str, req: AlunoUpdate, controller: AlunoController = Depends(get_controller)
@@ -45,10 +50,9 @@ async def aluno_updated(
     )
 
 
-#
-#
-#
-#
+# ===============================================
+# Get All Aluno
+# ===============================================
 @router.get("/", status_code=status.HTTP_200_OK)
 async def aluno_get_all(
     aluno_filtro: AlunoFiltro = Depends(),
@@ -62,10 +66,9 @@ async def aluno_get_all(
     )
 
 
-#
-#
-#
-#
+# ===============================================
+# Delete Aluno
+# ===============================================
 @router.delete("/{id}")
 async def aluno_delete(id: str, controller: AlunoController = Depends(get_controller)):
 
@@ -77,10 +80,9 @@ async def aluno_delete(id: str, controller: AlunoController = Depends(get_contro
     )
 
 
-#
-#
-#
-#
+# ===============================================
+# Import Excel Aluno
+# ===============================================
 @router.post("/importar-excel/", status_code=status.HTTP_200_OK)
 async def aluno_import_xlsx(
     file: UploadFile = File(...), controller: AlunoController = Depends(get_controller)
@@ -95,64 +97,18 @@ async def aluno_import_xlsx(
     )
 
 
-#
-#
-#
-#
+# ===============================================
+# Tamplete Excel Aluno
+# ===============================================
 @router.get("/export-tamplete-xlsx/", status_code=status.HTTP_200_OK)
 async def export_excel_aluno_tamplete(
     controller: AlunoController = Depends(get_controller),
 ):
 
-    try:
+    iterfile = await controller.export_excel_tamplete()
 
-        iterfile = await controller.export_excel_tamplete()
-
-        return StreamingResponse(
-            iterfile(),
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": "attachment; filename=tamplete_aluno.xlsx"},
-        )
-
-    except ValueError as err:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(err),
-        )
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
-
-
-#
-#
-#
-#
-@router.get("/export-lxp-manager/", status_code=status.HTTP_200_OK)
-async def export_lxp_manager(
-    controller: AlunoController = Depends(get_controller),
-):
-    try:
-
-        iterfile = await controller.export_lxp_manager()
-
-        return StreamingResponse(
-            iterfile(),
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": "attachment; filename=person_manager.csv"},
-        )
-
-    except ValueError as err:
-        raise
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(err),
-        )
-    except Exception as err:
-        raise
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Putz... Error inesperado meu nobre",
-        )
+    return StreamingResponse(
+        iterfile(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=tamplete_aluno.xlsx"},
+    )
