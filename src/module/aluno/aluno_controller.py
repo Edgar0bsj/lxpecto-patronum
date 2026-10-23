@@ -115,6 +115,10 @@ class AlunoController:
         for add in alunos_created:
             try:
                 self.aluno_created(AlunoCreate(nome=add.nome, cpf=add.cpf))
+            except ValueError as err:
+                alunos_impot_errs.append(
+                    AlunoImportError(nome=add.nome, cpf=add.cpf, detail=str(err))
+                )
             except ValidationError as err:
                 alunos_impot_errs.append(
                     AlunoImportError(nome=add.nome, cpf=add.cpf, detail=err.errors())
@@ -129,6 +133,10 @@ class AlunoController:
                 self.aluno_updated(
                     id=updat.id,
                     aluno_updated=AlunoUpdate(nome=updat.nome, cpf=updat.cpf),
+                )
+            except ValueError as err:
+                alunos_impot_errs.append(
+                    AlunoImportError(nome=updat.nome, cpf=updat.cpf, detail=str(err))
                 )
             except ValidationError as err:
                 alunos_impot_errs.append(

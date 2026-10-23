@@ -34,12 +34,6 @@ class AlunoService:
     def find_by_id(self, id: str) -> AlunoModel:
         return self.repo.find_by_id(id)
 
-    # =============================================
-    # Find By CPF
-    # =============================================
-    def find_by_cpf(self, cpf: str) -> AlunoModel:
-        return self.repo.find_by_cpf(cpf)
-
     # ===============================================
     # Model Aluno Para Response Aluno
     # ===============================================

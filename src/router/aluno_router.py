@@ -23,7 +23,8 @@ def get_controller():
 # ===============================================
 @router.post("/")
 async def aluno_created(
-    req: AlunoCreate, controller: AlunoController = Depends(get_controller)
+    req: AlunoCreate,
+    controller: AlunoController = Depends(get_controller),  # noqa: B008
 ):
 
     controller.aluno_created(req)
@@ -39,7 +40,9 @@ async def aluno_created(
 # ===============================================
 @router.patch("/{id}")
 async def aluno_updated(
-    id: str, req: AlunoUpdate, controller: AlunoController = Depends(get_controller)
+    id: str,
+    req: AlunoUpdate,
+    controller: AlunoController = Depends(get_controller),  # noqa: B008
 ):
 
     controller.aluno_updated(id, req)
@@ -55,8 +58,8 @@ async def aluno_updated(
 # ===============================================
 @router.get("/", status_code=status.HTTP_200_OK)
 async def aluno_get_all(
-    aluno_filtro: AlunoFiltro = Depends(),
-    controller: AlunoController = Depends(get_controller),
+    aluno_filtro: AlunoFiltro = Depends(),  # noqa: B008
+    controller: AlunoController = Depends(get_controller),  # noqa: B008
 ):
     alunos = controller.aluno_get_all(aluno_filtro)
 
@@ -69,15 +72,12 @@ async def aluno_get_all(
 # ===============================================
 # Delete Aluno
 # ===============================================
-@router.delete("/{id}")
-async def aluno_delete(id: str, controller: AlunoController = Depends(get_controller)):
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def aluno_delete(
+    id: str, controller: AlunoController = Depends(get_controller)  # noqa: B008
+):
 
     controller.aluno_delete(id)
-
-    return JSONResponse(
-        content=None,
-        status_code=status.HTTP_204_NO_CONTENT,
-    )
 
 
 # ===============================================
@@ -85,7 +85,8 @@ async def aluno_delete(id: str, controller: AlunoController = Depends(get_contro
 # ===============================================
 @router.post("/importar-excel/", status_code=status.HTTP_200_OK)
 async def aluno_import_xlsx(
-    file: UploadFile = File(...), controller: AlunoController = Depends(get_controller)
+    file: UploadFile = File(...),  # noqa: B008
+    controller: AlunoController = Depends(get_controller),  # noqa: B008
 ):
 
     iterfile = await controller.aluno_import_xlsx(file)
@@ -102,7 +103,7 @@ async def aluno_import_xlsx(
 # ===============================================
 @router.get("/export-tamplete-xlsx/", status_code=status.HTTP_200_OK)
 async def export_excel_aluno_tamplete(
-    controller: AlunoController = Depends(get_controller),
+    controller: AlunoController = Depends(get_controller),  # noqa: B008
 ):
 
     iterfile = await controller.export_excel_tamplete()

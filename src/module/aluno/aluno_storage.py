@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from src.database.db_config import SessionLocal, create_database
 from src.module.aluno.aluno_dto import AlunoFiltro
-from src.database.db_config import create_database, SessionLocal
 from src.module.aluno.aluno_model import AlunoModel
 
 

@@ -1,9 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from src.module.vinculo.vinculo_dto import VinculoDto, VinculoFiltro
-
-from src.database.db_config import create_database, SessionLocal
+from src.database.db_config import SessionLocal, create_database
+from src.module.vinculo.vinculo_dto import VinculoFiltro
 from src.module.vinculo.vinculo_model import VinculoModel
 
 
@@ -11,64 +10,46 @@ class VinculoStorage:
     def __init__(self):
         create_database()
 
-    #
-    #
-    #
-    #
-    def create(self, id: str, vinculo_dto: VinculoDto) -> "VinculoModel":
+    # =============================================
+    # CREATED
+    # =============================================
+    def save(self, vinculo_model: VinculoModel) -> None:
 
         with SessionLocal() as session:
 
-            vinculo = VinculoModel(
-                id=id,
-                matricula=vinculo_dto.matricula,
-                email=vinculo_dto.email,
-                status=vinculo_dto.status,
-                login=vinculo_dto.login,
-                senha=vinculo_dto.senha,
-                is_primary=vinculo_dto.is_primary,
-                aluno_id=vinculo_dto.aluno_id,
-                tags=vinculo_dto.tags,
-            )
-
-            session.add(vinculo)
+            session.add(vinculo_model)
             session.commit()
 
-            session.refresh(vinculo)
+            session.refresh(vinculo_model)
 
-            return vinculo
+            return vinculo_model
 
-    #
-    #
-    #
-    #
-    def update(self, id: str, vinculo_dto: VinculoDto) -> "VinculoModel":
+    # =============================================
+    # UPDATED
+    # =============================================
+    def update(self, id: str, vinculo_model: VinculoModel) -> None:
 
         with SessionLocal() as session:
 
             vinculo = session.get(VinculoModel, id)
 
-            if not vinculo:
-                return None
-
-            vinculo.matricula = vinculo_dto.matricula
-            vinculo.email = vinculo_dto.email
-            vinculo.status = vinculo_dto.status
-            vinculo.login = vinculo_dto.login
-            vinculo.senha = vinculo_dto.senha
-            vinculo.is_primary = vinculo_dto.is_primary
-            vinculo.aluno_id = vinculo_dto.aluno_id
-            vinculo.tags = vinculo_dto.tags
+            vinculo.matricula = vinculo_model.matricula
+            vinculo.email = vinculo_model.email
+            vinculo.status = vinculo_model.status
+            vinculo.login = vinculo_model.login
+            vinculo.senha = vinculo_model.senha
+            vinculo.is_primary = vinculo_model.is_primary
+            vinculo.tags = vinculo_model.tags
+            vinculo.aluno_id = vinculo_model.aluno_id
 
             session.commit()
             session.refresh(vinculo)
 
             return vinculo
 
-    #
-    #
-    #
-    #
+    # =============================================
+    # FIND ALL
+    # =============================================
     def find_all(self, vinculo_filtro: VinculoFiltro) -> list["VinculoModel"]:
         with SessionLocal() as session:
 
@@ -113,19 +94,25 @@ class VinculoStorage:
 
             return vinculo
 
-    #
-    #
-    #
-    #
+    # =============================================
+    # FIND BY ID
+    # =============================================
     def find_by_id(self, id: str) -> "VinculoModel":
 
         with SessionLocal() as session:
-            return session.get(VinculoModel, id)
 
-    #
-    #
-    #
-    #
+            statement = (
+                select(VinculoModel)
+                .where(VinculoModel.id == id)
+                .options(selectinload(VinculoModel.aluno))
+            )
+
+            vinculos = session.scalars(statement).first()
+            return vinculos
+
+    # =============================================
+    # DELETED
+    # =============================================
     def delete(self, id: str) -> bool:
 
         with SessionLocal() as session:
@@ -139,3 +126,29 @@ class VinculoStorage:
             session.commit()
 
             return True
+
+    # =============================================
+    # IS EXIST
+    # =============================================
+    def is_exist(
+        self,
+        *,
+        matricula: str | None = None,
+        email: str | None = None,
+        login: str | None = None,
+    ) -> bool:
+        with SessionLocal() as session:
+
+            statement = select(VinculoModel)
+
+            if matricula:
+                statement = statement.where(VinculoModel.matricula == matricula)
+            if email:
+                statement = statement.where(VinculoModel.email == email)
+            if login:
+                statement = statement.where(VinculoModel.login == login)
+
+            statement = statement.limit(1)
+            existe = session.scalar(statement)
+
+            return bool(existe)
